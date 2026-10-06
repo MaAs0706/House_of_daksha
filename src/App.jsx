@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GallerySection from "./components/GallerySection.jsx";
+import FlowingMenu from "./components/FlowingMenu.jsx";
 
 const asset = (filename) => `${import.meta.env.BASE_URL}images/${filename}`;
 
@@ -126,7 +127,48 @@ function PetalField() {
   );
 }
 
-function SiteHeader() {
+function SiteHeader({ page }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuToggleRef = useRef(null);
+  const menuCloseRef = useRef(null);
+  const links = [
+    ["Home", "home"],
+    ["Shop", "shop"],
+    ["Collections", "collections"],
+    ["Gallery", "gallery"],
+    ["About us", "about"],
+    ["Contact", "contact"],
+    ["Product care", "care"],
+  ];
+  const flowingItems = links.map(([text, route], index) => ({
+    text,
+    link: `#/${route}`,
+    image: asset(`gallery/look-${String(index === 6 ? 12 : index + 1).padStart(2, "0")}.jpg`),
+  }));
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    menuCloseRef.current?.focus();
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        window.requestAnimationFrame(() => menuToggleRef.current?.focus());
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = oldOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    window.requestAnimationFrame(() => menuToggleRef.current?.focus());
+  };
+
   return (
     <>
       <div className="top-note">
@@ -135,20 +177,41 @@ function SiteHeader() {
         <span>GOOD COTTON. GOOD DAYS.</span>
       </div>
       <header className="masthead">
-        <a className="brand-lockup" href="#top" aria-label="House of Daksha home">
+        <a className="brand-lockup" href="#/home" aria-label="House of Daksha home">
           <BrandMark />
           <span className="brand-caption">A HOUSE FOR EVERY CHAPTER</span>
         </a>
         <nav className="top-nav" aria-label="Main navigation">
-          <a href="#gallery">Gallery</a>
-          <a href="#bloom">Find your feeling</a>
-          <a href="#our-thought">Our thought</a>
-          <a href="#motherhood">Motherhood</a>
+          {links.map(([label, route]) => (
+            <a href={`#/${route}`} key={route} aria-current={route === page ? "page" : undefined}>{label}</a>
+          ))}
         </nav>
-        <a className="nav-note" href="#bloom">
+        <a className="nav-note" href="#/gallery">
           THE DAKSHA EDIT <span aria-hidden="true">↘</span>
         </a>
+        <button
+          ref={menuToggleRef}
+          className="mobile-menu-toggle"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          onClick={() => setMenuOpen(true)}
+        >
+          <span>MENU</span><i aria-hidden="true"><b /><b /></i>
+        </button>
       </header>
+      {menuOpen && (
+        <div className="mobile-flow-overlay" role="dialog" aria-modal="true" aria-label="Site navigation">
+          <div className="mobile-flow-head">
+            <a className="mobile-flow-brand" href="#/home" onClick={closeMenu}>
+              HOUSE <span>OF</span> DAKSHA
+            </a>
+            <button ref={menuCloseRef} className="mobile-flow-close" type="button" aria-label="Close navigation menu" onClick={closeMenu}>×</button>
+          </div>
+          <FlowingMenu items={flowingItems} onSelect={closeMenu} />
+        </div>
+      )}
     </>
   );
 }
@@ -294,7 +357,7 @@ function BloomSection() {
           </h3>
           <p className="collection-description">{collection.description}</p>
           <p className="collection-signoff">{collection.signoff}</p>
-          <a className="collection-link" href={collection.destination}>
+          <a className="collection-link" href="#/about">
             {collection.link} <span aria-hidden="true">↗</span>
           </a>
         </div>
@@ -376,8 +439,8 @@ function MotherhoodSection() {
           flattering pieces that let you step out feeling like yourself—through
           every new beginning.
         </p>
-        <a href="#bloom" className="motherhood-link">
-          Find your petal <span aria-hidden="true">↗</span>
+        <a href="#/collections" className="motherhood-link">
+          Explore the collections <span aria-hidden="true">↗</span>
         </a>
       </div>
       <div className="motherhood-quote">
@@ -405,7 +468,7 @@ function ClosingSection() {
         <br />
         <em>good on you.</em>
       </h2>
-      <a href="#bloom" className="closing-link">
+      <a href="#/collections" className="closing-link">
         Find your kind of day <span aria-hidden="true">↗</span>
       </a>
       <svg viewBox="0 0 200 150" className="closing-flower" aria-hidden="true">
@@ -419,39 +482,210 @@ function ClosingSection() {
 function SiteFooter() {
   return (
     <footer className="footer-v2">
-      <a className="footer-wordmark" href="#top">
+      <a className="footer-wordmark" href="#/home">
         HOUSE <i>OF</i> DAKSHA <span>✳</span>
       </a>
       <p>Handpicked for the life you live.</p>
       <nav aria-label="Footer navigation">
-        <a href="#bloom">The collections</a>
-        <a href="#our-thought">Our thought</a>
-        <a href="#motherhood">Motherhood</a>
+        <a href="#/shop">Shop</a>
+        <a href="#/collections">Collections</a>
+        <a href="#/gallery">Gallery</a>
+        <a href="#/about">About us</a>
+        <a href="#/contact">Contact</a>
+        <a href="#/care">Product care</a>
       </nav>
       <small>© {new Date().getFullYear()} HOUSE OF DAKSHA</small>
     </footer>
   );
 }
 
+function PageIntro({ kicker, title, accent, description }) {
+  return (
+    <header className="inner-page-intro">
+      <p className="section-kicker">{kicker}</p>
+      <h1>{title}<br /><em>{accent}</em></h1>
+      <p>{description}</p>
+    </header>
+  );
+}
+
+function HomePage() {
+  return (
+    <>
+      <Hero />
+      <section className="breath-line" aria-label="Our approach">
+        <span>Not dressed up.</span>
+        <em>Just dressed like yourself.</em>
+        <span className="breath-flower" aria-hidden="true">✿</span>
+      </section>
+      <section className="home-discover">
+        <div>
+          <p className="section-kicker">A LITTLE LOOK AROUND</p>
+          <h2>Real days.<br /><em>Real House of Daksha.</em></h2>
+        </div>
+        <p>See the colours, prints and people who bring our everyday cottons to life.</p>
+        <a className="collection-link" href="#/gallery">Step into the gallery <span aria-hidden="true">↗</span></a>
+      </section>
+      <MotherhoodSection />
+      <ClosingSection />
+    </>
+  );
+}
+
+function ShopPage() {
+  return (
+    <div className="inner-page shop-page">
+      <PageIntro
+        kicker="THE HOUSE OF DAKSHA SHOP"
+        title="Good clothes for"
+        accent="the life you live."
+        description="Thoughtfully handpicked cotton dresses, easy co-ords and comfortable maternity wear—made for workdays, slow mornings and everything between."
+      />
+      <div className="shop-categories">
+        {[
+          ["01", "Everyday cottons", "Soft, breathable pieces for the everyday."],
+          ["02", "Co-ords to go", "An easy, pulled-together answer to getting dressed."],
+          ["03", "Motherhood in bloom", "Comfort and confidence through every new chapter."],
+        ].map(([number, title, copy]) => (
+          <a className="shop-category" href="#/collections" key={number}>
+            <span className="shop-category-number">{number} <i>✳</i></span>
+            <h2>{title}</h2>
+            <p>{copy}</p>
+            <span className="shop-category-link">Explore the collection <b aria-hidden="true">↗</b></span>
+          </a>
+        ))}
+      </div>
+      <a className="shop-gallery-link" href="#/gallery">See the pieces in real life <span aria-hidden="true">↗</span></a>
+    </div>
+  );
+}
+
+function CollectionsPage() {
+  return (
+    <div className="inner-page collections-page">
+      <PageIntro
+        kicker="THREE PETALS. A THOUSAND KINDS OF DAY."
+        title="Find your kind"
+        accent="of everyday."
+        description="Choose a collection to find the kind of comfort that feels right for you."
+      />
+      <BloomSection />
+      <div className="collection-page-note">
+        <p className="section-kicker">A NOTE FROM DAKSHA</p>
+        <p>Every collection begins with the same thought: you deserve to feel comfortable, look like yourself, and stay within budget.</p>
+        <a className="collection-link" href="#/about">Read our story <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  );
+}
+
+function GalleryPage() {
+  return (
+    <div className="inner-page gallery-page">
+      <GallerySection />
+    </div>
+  );
+}
+
+function AboutPage() {
+  return (
+    <div className="inner-page about-page">
+      <PageIntro
+        kicker="THE THOUGHT BEHIND THE CLOTHES"
+        title="Comfort, confidence"
+        accent="and a little room."
+        description="House of Daksha is here for the everyday and the life-changing—with handpicked cottons and easy silhouettes that feel good to live in."
+      />
+      <StorySection />
+      <div className="about-values">
+        <p><span>01</span><strong>Comfort first.</strong> Breathable fabrics and shapes made for moving through your day.</p>
+        <p><span>02</span><strong>Thoughtfully chosen.</strong> Versatile pieces you can make your own, again and again.</p>
+        <p><span>03</span><strong>Within reach.</strong> Everyday style at prices that make sense for real life.</p>
+      </div>
+    </div>
+  );
+}
+
+function ContactPage() {
+  return (
+    <div className="inner-page contact-page">
+      <PageIntro
+        kicker="WE’RE HERE TO HELP"
+        title="Let’s have"
+        accent="a conversation."
+        description="Questions about a collection, sizing or finding the right piece? We’d love to hear what you’re looking for."
+      />
+      <div className="contact-card">
+        <BrandMark />
+        <h2>A note to Daksha</h2>
+        <p>For product questions, orders or just to say hello, reach out through the contact details below.</p>
+        <div className="contact-details">
+          <span>EMAIL</span><strong>Contact details coming soon</strong>
+          <span>SOCIAL</span><strong>Follow along for new arrivals and updates</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CarePage() {
+  return (
+    <div className="inner-page care-page">
+      <PageIntro
+        kicker="A LITTLE CARE GOES A LONG WAY"
+        title="Keep the good"
+        accent="days going."
+        description="A few gentle habits can help your cotton pieces stay soft, comfortable and ready for another day out."
+      />
+      <div className="care-list">
+        {[
+          ["01", "Read the garment label", "Care instructions can vary by fabric and finish, so check the label before washing."],
+          ["02", "Wash gently", "Use a gentle cycle and cool water where the care label allows. Wash similar colours together."],
+          ["03", "Let it dry in the shade", "Air-drying helps cotton keep its colour and feel. Avoid prolonged direct sunlight."],
+          ["04", "Press with care", "Use a low to medium iron setting, following the garment label. Turn detailed prints inside out."],
+        ].map(([number, title, copy]) => (
+          <article className="care-step" key={number}>
+            <span>{number}</span><div><h2>{title}</h2><p>{copy}</p></div>
+          </article>
+        ))}
+      </div>
+      <p className="care-footnote">When in doubt, follow the care label attached to your garment.</p>
+    </div>
+  );
+}
+
 export default function App() {
+  const [page, setPage] = useState(() => {
+    const route = window.location.hash.match(/^#\/([^?]*)/);
+    return route?.[1] || "home";
+  });
+
+  useEffect(() => {
+    const syncPage = () => {
+      const route = window.location.hash.match(/^#\/([^?]*)/);
+      setPage(route?.[1] || "home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("hashchange", syncPage);
+    return () => window.removeEventListener("hashchange", syncPage);
+  }, []);
+
+  const pages = {
+    home: <HomePage />,
+    shop: <ShopPage />,
+    collections: <CollectionsPage />,
+    gallery: <GalleryPage />,
+    about: <AboutPage />,
+    contact: <ContactPage />,
+    care: <CarePage />,
+  };
+
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
       <PetalField />
-      <SiteHeader />
-      <main id="main">
-        <Hero />
-        <section className="breath-line" aria-label="Our approach">
-          <span>Not dressed up.</span>
-          <em>Just dressed like yourself.</em>
-          <span className="breath-flower" aria-hidden="true">✿</span>
-        </section>
-        <GallerySection />
-        <BloomSection />
-        <StorySection />
-        <MotherhoodSection />
-        <ClosingSection />
-      </main>
+      <SiteHeader page={page} />
+      <main id="main">{pages[page] ?? <HomePage />}</main>
       <SiteFooter />
     </>
   );
