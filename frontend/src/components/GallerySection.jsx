@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CircularCarousel from "./CircularCarousel.jsx";
+import DepthCarousel from "./DepthCarousel.jsx";
 
 const asset = (filename) => `${import.meta.env.BASE_URL}images/${filename}`;
 
@@ -90,6 +91,8 @@ const galleryItems = [
   },
 ];
 
+const depthCarouselItems = galleryItems.map(({ src, alt }) => ({ image: src, alt }));
+
 function GalleryMark() {
   return (
     <svg className="gallery-mark" viewBox="0 0 100 100" aria-hidden="true">
@@ -101,7 +104,18 @@ function GalleryMark() {
 
 export default function GallerySection() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 650px)").matches,
+  );
   const activeItem = galleryItems[activeIndex] ?? galleryItems[0];
+
+  useEffect(() => {
+    const viewport = window.matchMedia("(max-width: 650px)");
+    const updateLayout = (event) => setIsMobile(event.matches);
+    setIsMobile(viewport.matches);
+    viewport.addEventListener("change", updateLayout);
+    return () => viewport.removeEventListener("change", updateLayout);
+  }, []);
 
   return (
     <section className="gallery-section" id="gallery">
@@ -120,32 +134,54 @@ export default function GallerySection() {
       <div className="gallery-carousel-wrap">
         <div className="gallery-thread gallery-thread-left" aria-hidden="true" />
         <div className="gallery-carousel-frame">
-          <CircularCarousel
-            items={galleryItems}
-            preset="cylinder"
-            intro="rise"
-            cardWidth={440}
-            aspectRatio={0.92}
-            gap={22}
-            autoplay="drift"
-            speed={6}
-            direction="right"
-            draggable
-            momentum={0.48}
-            snap
-            pauseOnHover
-            focusOnClick
-            parallax={0.16}
-            stretch={0.2}
-            depthFade={0.24}
-            fadeColor="#e8e8de"
-            innerShade={0.28}
-            cornerRadius={4}
-            captions={false}
-            onChange={setActiveIndex}
-            onItemClick={(_, index) => setActiveIndex(index)}
-            className="daksha-carousel"
-          />
+          {isMobile ? (
+            <DepthCarousel
+              items={depthCarouselItems}
+              cardWidth={280}
+              cardHeight={344}
+              radius={5}
+              tint="#46513f"
+              depth={190}
+              spread={78}
+              tilt={16}
+              tiltDirection="right"
+              perspective={1300}
+              visibleCards={3}
+              falloff={0.16}
+              blur={1.5}
+              autoplay={false}
+              loop
+              onChange={setActiveIndex}
+              className="daksha-depth-carousel"
+            />
+          ) : (
+            <CircularCarousel
+              items={galleryItems}
+              preset="cylinder"
+              intro="rise"
+              cardWidth={440}
+              aspectRatio={0.92}
+              gap={22}
+              autoplay="drift"
+              speed={6}
+              direction="right"
+              draggable
+              momentum={0.48}
+              snap
+              pauseOnHover
+              focusOnClick
+              parallax={0.16}
+              stretch={0.2}
+              depthFade={0.24}
+              fadeColor="#e8e8de"
+              innerShade={0.28}
+              cornerRadius={4}
+              captions={false}
+              onChange={setActiveIndex}
+              onItemClick={(_, index) => setActiveIndex(index)}
+              className="daksha-carousel"
+            />
+          )}
         </div>
         <div className="gallery-thread gallery-thread-right" aria-hidden="true" />
         <GalleryMark />
@@ -164,7 +200,7 @@ export default function GallerySection() {
         </div>
         <p className="gallery-feature-note">{activeItem.note}</p>
         <p className="gallery-instruction">
-          DRAG TO WANDER <span aria-hidden="true">✳</span> CLICK A LOOK TO BRING IT FORWARD
+          {isMobile ? "SWIPE TO WANDER" : "DRAG TO WANDER"} <span aria-hidden="true">✳</span> {isMobile ? "TAP A LOOK TO BRING IT FORWARD" : "CLICK A LOOK TO BRING IT FORWARD"}
         </p>
       </div>
     </section>
