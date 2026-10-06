@@ -1,5 +1,4 @@
-/node_modules/
-/dist/
-/.DS_Store
-/public/images/hero-cotton-fashion.png
-/public/images/cotton-still-life-source.png
+node_modules/
+dist/
+.DS_Store
+frontend/assets/source-photos/
