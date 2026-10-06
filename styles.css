@@ -61,8 +61,17 @@ a { color: inherit; }
 .annotation-bottom small { font-family: var(--sans); font-size: 5px; letter-spacing: .13em; line-height: 1.5; text-align: center; }
 .hero-side-label { position: absolute; top: 50%; right: 22px; writing-mode: vertical-rl; color: #9a9284; font-size: 7px; letter-spacing: .2em; }
 .petal-field { position: fixed; z-index: 4; inset: 0; overflow: hidden; pointer-events: none; }
-.petal { position: absolute; width: var(--petal-width, 8px); height: var(--petal-height, 13px); border-radius: 90% 10% 80% 10%; background: rgba(213,155,155,.72); opacity: 0; animation: drift var(--duration, 20s) linear var(--delay, 0s) infinite; }
-@keyframes drift { 0% { transform: translate3d(0,-10vh,0) rotate(0); opacity: 0; } 8% { opacity: var(--alpha, .14); } 90% { opacity: var(--alpha, .14); } 100% { transform: translate3d(var(--sway, 28px),115vh,0) rotate(300deg); opacity: 0; } }
+.petal { position: absolute; width: var(--petal-width, 11px); height: var(--petal-height, 16px); border-radius: 90% 10% 80% 10%; background: rgba(204,132,142,.8); box-shadow: inset 1px 0 0 rgba(255,250,241,.45), 0 2px 3px rgba(128,85,81,.08); opacity: 0; animation: drift var(--duration, 22s) ease-in-out var(--delay, 0s) infinite; }
+.petal-1 { background: rgba(222,164,161,.84); }
+.petal-2 { background: rgba(191,133,141,.72); }
+@keyframes drift {
+  0% { transform: translate3d(0,-10vh,0) rotate(0) scale(.78); opacity: 0; }
+  8% { opacity: var(--alpha, .24); }
+  32% { transform: translate3d(var(--sway-a, 40px),30vh,0) rotate(120deg) scale(1); }
+  62% { transform: translate3d(var(--sway-b, -30px),68vh,0) rotate(245deg) scale(.9); }
+  90% { opacity: var(--alpha, .24); }
+  100% { transform: translate3d(var(--sway, 28px),115vh,0) rotate(390deg) scale(.72); opacity: 0; }
+}
 .breath-line { min-height: 127px; display: flex; align-items: center; justify-content: center; gap: 15px; padding: 24px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-size: clamp(18px, 2.15vw, 29px); }
 .breath-line > span:first-child { color: #777268; }
 .breath-line em { color: var(--olive); }
