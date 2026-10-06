@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import GallerySection from "./components/GallerySection.jsx";
 
 const asset = (filename) => `${import.meta.env.BASE_URL}images/${filename}`;
 
@@ -139,6 +140,7 @@ function SiteHeader() {
           <span className="brand-caption">A HOUSE FOR EVERY CHAPTER</span>
         </a>
         <nav className="top-nav" aria-label="Main navigation">
+          <a href="#gallery">Gallery</a>
           <a href="#bloom">Find your feeling</a>
           <a href="#our-thought">Our thought</a>
           <a href="#motherhood">Motherhood</a>
@@ -444,6 +446,7 @@ export default function App() {
           <em>Just dressed like yourself.</em>
           <span className="breath-flower" aria-hidden="true">✿</span>
         </section>
+        <GallerySection />
         <BloomSection />
         <StorySection />
         <MotherhoodSection />
