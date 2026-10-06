@@ -2,3 +2,4 @@ node_modules/
 dist/
 .DS_Store
 frontend/assets/source-photos/
+frontend/assets/unused-assets/
