@@ -61,6 +61,64 @@ function BrandMark() {
   );
 }
 
+function DakshaIntro({ onEnter }) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    const closeTimer = window.setTimeout(() => setIsClosing(true), 3100);
+    return () => window.clearTimeout(closeTimer);
+  }, []);
+
+  useEffect(() => {
+    if (!isClosing) return undefined;
+    const enterTimer = window.setTimeout(onEnter, 680);
+    return () => window.clearTimeout(enterTimer);
+  }, [isClosing, onEnter]);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsClosing(true);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
+
+  return (
+    <section className={`daksha-intro ${isClosing ? "is-closing" : ""}`} role="dialog" aria-modal="true" aria-label="House of Daksha opening">
+      <button className="intro-skip" type="button" onClick={() => setIsClosing(true)}>
+        ENTER THE HOUSE <span aria-hidden="true">↗</span>
+      </button>
+      <div className="intro-composition">
+        <p className="intro-kicker"><span /> A HOUSE FOR EVERY CHAPTER <span /></p>
+        <div className="intro-nameplate">
+          <span>THOUGHTFULLY HANDPICKED</span>
+          <h1>HOUSE <i>OF</i> DAKSHA</h1>
+        </div>
+        <div className="intro-swatch">
+          <img src={asset("cotton-still-life.jpg")} alt="" />
+          <svg className="intro-stitch" viewBox="0 0 900 360" preserveAspectRatio="none" aria-hidden="true">
+            <path className="intro-thread-path" d="M-20 290C108 290 89 76 219 111s112 150 202 88 100-108 177-75 89 118 173 66 95-114 151-142" />
+            <path className="intro-thread-flower" d="M420 175c-35-29-15-66 14-58 5-36 52-32 53 4 33-12 57 27 27 52 12 34-27 57-52 30-33 14-59-11-42-28Z" />
+            <circle className="intro-thread-center" cx="468" cy="175" r="9" />
+          </svg>
+          <span className="intro-swatch-edge" aria-hidden="true" />
+          <div className="intro-mark"><BrandMark /></div>
+        </div>
+        <div className="intro-signoff">
+          <p>GOOD COTTON. GOOD DAYS.</p>
+          <span>A little room to bloom.</span>
+        </div>
+      </div>
+      <div className="intro-corner-note" aria-hidden="true">MADE TO FEEL LIKE YOU <i>✳</i></div>
+    </section>
+  );
+}
+
 function PetalField() {
   const [petals, setPetals] = useState([]);
 
@@ -218,9 +276,22 @@ function SiteHeader({ page }) {
   );
 }
 
-function Hero() {
+function Hero({ introActive = false }) {
+  const [animateEntrance] = useState(() => {
+    if (typeof window === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    if (new URLSearchParams(window.location.search).get("intro") === "1") return true;
+    try { return !window.sessionStorage.getItem("daksha-hero-intro-seen"); }
+    catch { return true; }
+  });
+
+  useEffect(() => {
+    if (!animateEntrance) return;
+    if (new URLSearchParams(window.location.search).get("intro") === "1") return;
+    try { window.sessionStorage.setItem("daksha-hero-intro-seen", "true"); } catch {}
+  }, [animateEntrance]);
+
   return (
-    <section className="hero-v2" id="top">
+    <section className={`hero-v2 ${animateEntrance && !introActive ? "is-entering" : ""}`} id="top">
       <div className="hero-words">
         <p className="hero-overline">
           <span /> CLOTHES FOR A LIFE IN MOTION
@@ -245,6 +316,13 @@ function Hero() {
         </div>
       </div>
       <div className="hero-image-wrap">
+        <svg className="hero-entry-vine" viewBox="0 0 380 620" aria-hidden="true">
+          <path className="entry-vine-stem" d="M15 605C82 533 33 469 96 398S143 268 84 211 136 93 319 18" />
+          <path className="entry-vine-leaves" d="M91 402c-42-4-60-29-57-56 31 3 51 23 57 56Zm5-5c8-34 31-49 56-43-7 27-27 43-56 43ZM91 245c-38-7-51-33-44-58 29 5 46 25 44 58Zm2-5c10-31 34-42 57-32-10 24-30 36-57 32Zm60-103c-29-14-35-39-21-60 23 11 33 34 21 60Zm1-4c18-24 43-28 62-12-15 19-37 24-62 12Z" />
+          <path className="entry-vine-blossom" d="M49 520c-19-15-8-35 7-31 3-19 27-18 28 2 18-7 31 14 15 28 7 17-14 30-28 16-17 7-31-6-22-15Z" />
+          <circle className="entry-vine-heart" cx="75" cy="520" r="5" />
+        </svg>
+        <div className="hero-unfurl-stamp" aria-hidden="true"><BrandMark /></div>
         <div className="photo-frame">
           <img
             src={asset("hero-cotton-fashion.jpg")}
@@ -512,10 +590,10 @@ function PageIntro({ kicker, title, accent, description }) {
   );
 }
 
-function HomePage() {
+function HomePage({ introActive = false }) {
   return (
     <>
-      <Hero />
+      <Hero introActive={introActive} />
       <section className="breath-line" aria-label="Our approach">
         <span>Not dressed up.</span>
         <em>Just dressed like yourself.</em>
@@ -634,6 +712,9 @@ export default function App() {
   const getRoute = () => window.location.hash.replace(/^#\/?/, "").split("?")[0].split("/");
   const [route, setRoute] = useState(getRoute);
   const page = route[0] || "home";
+  const [showIntro, setShowIntro] = useState(() => (
+    page === "home" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ));
 
   useEffect(() => {
     const syncPage = () => {
@@ -645,7 +726,7 @@ export default function App() {
   }, []);
 
   const pages = {
-    home: <HomePage />,
+    home: <HomePage introActive={showIntro} />,
     shop: <ShopCatalogPage />,
     collections: <CollectionsPage />,
     gallery: <GalleryPage />,
@@ -667,6 +748,7 @@ export default function App() {
       <SiteHeader page={page} />
       <main id="main">{pages[page] ?? <HomePage />}</main>
       <SiteFooter />
+      {showIntro && page === "home" && <DakshaIntro onEnter={() => setShowIntro(false)} />}
     </>
   );
 }
