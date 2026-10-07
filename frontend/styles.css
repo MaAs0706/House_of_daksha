@@ -781,3 +781,28 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
   .admin-item-row { grid-template-columns: 38px minmax(0, 1fr) auto; gap: 5px; }
   .admin-item-thumb { width: 36px; height: 48px; }
 }
+
+/* Final mobile overrides follow the late-loaded storefront component styles. */
+@media (max-width: 760px) {
+  .home-brand-intro { width: 100%; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 22px; padding: 62px 26px; }
+  .home-brand-heading, .home-brand-copy { width: 100%; max-width: 100%; min-width: 0; }
+  .home-brand-heading h2 { max-width: 15ch; font-size: clamp(36px, 10vw, 46px); }
+  .home-brand-copy { font-size: 15px; line-height: 1.8; }
+}
+
+@media (max-width: 650px) {
+  .mobile-flow-overlay { height: 100vh; height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+  .mobile-flow-head { height: 72px; min-height: 72px; flex-basis: 72px; }
+  .menu-wrap { height: auto; min-height: 0; flex: 1 1 auto; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  .menu { height: auto; min-height: 100%; justify-content: flex-start; }
+  .menu__item { flex: 0 0 60px; min-height: 60px; }
+  .menu__item-link { justify-content: center; padding: 0 18px; font-size: 19px; letter-spacing: .07em; }
+  .menu__item:nth-child(3), .menu__item:nth-child(4), .menu__item:nth-child(5), .menu__item:nth-child(6) { flex-basis: 47px; min-height: 47px; background: rgba(104,116,90,.035); }
+  .menu__item:nth-child(3) .menu__item-link,
+  .menu__item:nth-child(4) .menu__item-link,
+  .menu__item:nth-child(5) .menu__item-link,
+  .menu__item:nth-child(6) .menu__item-link { justify-content: flex-start; padding-left: 14vw; color: var(--olive-dark) !important; font-size: 14px; letter-spacing: .035em; }
+  .menu__item:nth-child(3) .marquee, .menu__item:nth-child(4) .marquee,
+  .menu__item:nth-child(5) .marquee, .menu__item:nth-child(6) .marquee { display: none; }
+  .marquee__part span { font-size: 19px; }
+}
