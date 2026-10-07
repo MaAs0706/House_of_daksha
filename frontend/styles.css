@@ -718,3 +718,66 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
   .home-discover .collection-link { grid-column: auto; margin-top: 5px; }
   .footer-v2 nav { justify-content: flex-start; }
 }
+
+/* Small-screen finishing pass: keep the editorial layout readable at phone widths. */
+@media (max-width: 650px) {
+  .hero-v2 { padding-right: clamp(19px, 6vw, 25px); padding-left: clamp(19px, 6vw, 25px); }
+  .hero-v2 h1 { max-width: 100%; font-size: clamp(58px, 16.5vw, 82px); line-height: .9; }
+  .hero-words { min-width: 0; }
+  .hero-image-wrap { width: min(92%, 430px); min-height: 0; height: min(112vw, 460px); }
+  .inner-page-intro h1 { font-size: clamp(36px, 11vw, 49px); line-height: .98; overflow-wrap: anywhere; }
+  .inner-page-intro > p:last-child { max-width: 42rem; line-height: 1.75; }
+  .catalog-products, .collection-directory-grid { width: 100%; gap: 24px 12px; }
+  .catalog-product-meta { align-items: flex-start; }
+  .catalog-product-meta h2 { font-size: clamp(15px, 4.5vw, 19px); line-height: 1.15; }
+  .catalog-product-meta > strong { font-size: 11px; }
+  .catalog-product-meta > strong del { margin-left: 3px; }
+  .collection-directory-card img { height: auto; aspect-ratio: 4 / 5; }
+  .product-detail-page { padding-top: 35px; }
+  .product-back-link { max-width: 100%; overflow-wrap: anywhere; }
+  .product-detail-image { width: 100%; aspect-ratio: 4 / 4.8; max-height: none; }
+  .product-detail-copy h1 { font-size: clamp(38px, 11vw, 54px); overflow-wrap: anywhere; }
+  .product-detail-description { font-size: 12px; line-height: 1.8; }
+  .gallery-carousel-wrap { height: clamp(340px, 105vw, 430px); min-height: 0; }
+  .gallery-feature { width: calc(100% - 38px); grid-template-columns: 48px minmax(0, 1fr); column-gap: 10px; }
+  .gallery-feature-title h3 { font-size: clamp(19px, 6vw, 23px); line-height: 1.08; }
+  .footer-v2 { align-items: center; }
+  .footer-v2 nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px 8px; }
+  .footer-v2 nav a { font-size: 8px; }
+  .footer-v2 > small { max-width: 110px; line-height: 1.5; text-align: right; }
+  .admin-topbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .admin-topbar > span { max-width: 100%; text-align: left; }
+  .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .admin-stats article { min-height: 104px; padding: 14px; }
+  .admin-stats article:last-child { grid-column: 1 / -1; }
+  .admin-stats strong { font-size: 29px; }
+  .admin-quick-actions { flex-direction: column; }
+  .admin-panel-heading { align-items: flex-start; }
+  .admin-panel-heading h2, .admin-form-heading h2 { font-size: 26px; }
+  .admin-item-row { grid-template-columns: 42px minmax(0, 1fr) auto; gap: 7px; }
+  .admin-item-info { min-width: 0; }
+  .admin-item-info h3, .admin-item-info p { overflow-wrap: anywhere; }
+  .admin-item-row .admin-text-button, .admin-item-row .admin-delete-button { padding: 8px 6px; font-size: 9px; }
+  .admin-edit-form { min-width: 0; }
+  .admin-form-heading { align-items: flex-start; }
+}
+
+@media (max-width: 390px) {
+  .top-note { font-size: 5px; letter-spacing: .12em; }
+  .masthead { padding-right: 16px; padding-left: 16px; }
+  .brand-caption { max-width: 72px; }
+  .hero-v2 h1 { font-size: clamp(54px, 15.5vw, 64px); }
+  .hero-image-wrap { width: 96%; margin-right: 0; }
+  .catalog-products, .collection-directory-grid { grid-template-columns: 1fr; }
+  .catalog-product-meta { flex-direction: row; align-items: center; justify-content: space-between; }
+  .catalog-product-meta h2 { font-size: 19px; }
+  .collection-directory-card img { aspect-ratio: 5 / 4; }
+  .mobile-flow-head { padding-right: 15px; padding-left: 15px; }
+  .menu__item-link, .marquee__part span { font-size: clamp(17px, 5vw, 22px); }
+  .admin-sidebar { grid-template-columns: 1fr auto; }
+  .admin-sidebar .admin-brand { grid-column: 1 / -1; }
+  .admin-nav-item { justify-content: center; }
+  .admin-main { padding-right: 12px; padding-left: 12px; }
+  .admin-item-row { grid-template-columns: 38px minmax(0, 1fr) auto; gap: 5px; }
+  .admin-item-thumb { width: 36px; height: 48px; }
+}
