@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import GallerySection from "./components/GallerySection.jsx";
 import FlowingMenu from "./components/FlowingMenu.jsx";
+import { ShopCatalogPage, CollectionDirectory, CollectionDetailPage, ProductDetailPage } from "./components/CatalogPages.jsx";
+import { AdminLoginPage, AdminDashboardPage } from "./components/AdminPages.jsx";
 
 const asset = (filename) => `${import.meta.env.BASE_URL}images/${filename}`;
 
@@ -140,7 +142,7 @@ function SiteHeader({ page }) {
     ["Contact", "contact"],
     ["Product care", "care"],
   ];
-  const flowingItems = links.map(([text, route], index) => ({
+  const flowingItems = [...links, ["Admin login", "admin/login"]].map(([text, route], index) => ({
     text,
     link: `#/${route}`,
     image: asset(`gallery/look-${String(index === 6 ? 12 : index + 1).padStart(2, "0")}.jpg`),
@@ -186,8 +188,8 @@ function SiteHeader({ page }) {
             <a href={`#/${route}`} key={route} aria-current={route === page ? "page" : undefined}>{label}</a>
           ))}
         </nav>
-        <a className="nav-note" href="#/gallery">
-          THE DAKSHA EDIT <span aria-hidden="true">↘</span>
+        <a className="nav-note admin-login-link" href="#/admin/login">
+          ADMIN LOGIN <span aria-hidden="true">↗</span>
         </a>
         <button
           ref={menuToggleRef}
@@ -493,6 +495,7 @@ function SiteFooter() {
         <a href="#/about">About us</a>
         <a href="#/contact">Contact</a>
         <a href="#/care">Product care</a>
+        <a href="#/admin/login">Admin</a>
       </nav>
       <small>© {new Date().getFullYear()} HOUSE OF DAKSHA</small>
     </footer>
@@ -532,34 +535,6 @@ function HomePage() {
   );
 }
 
-function ShopPage() {
-  return (
-    <div className="inner-page shop-page">
-      <PageIntro
-        kicker="THE HOUSE OF DAKSHA SHOP"
-        title="Good clothes for"
-        accent="the life you live."
-        description="Thoughtfully handpicked cotton dresses, easy co-ords and comfortable maternity wear—made for workdays, slow mornings and everything between."
-      />
-      <div className="shop-categories">
-        {[
-          ["01", "Everyday cottons", "Soft, breathable pieces for the everyday."],
-          ["02", "Co-ords to go", "An easy, pulled-together answer to getting dressed."],
-          ["03", "Motherhood in bloom", "Comfort and confidence through every new chapter."],
-        ].map(([number, title, copy]) => (
-          <a className="shop-category" href="#/collections" key={number}>
-            <span className="shop-category-number">{number} <i>✳</i></span>
-            <h2>{title}</h2>
-            <p>{copy}</p>
-            <span className="shop-category-link">Explore the collection <b aria-hidden="true">↗</b></span>
-          </a>
-        ))}
-      </div>
-      <a className="shop-gallery-link" href="#/gallery">See the pieces in real life <span aria-hidden="true">↗</span></a>
-    </div>
-  );
-}
-
 function CollectionsPage() {
   return (
     <div className="inner-page collections-page">
@@ -570,6 +545,7 @@ function CollectionsPage() {
         description="Choose a collection to find the kind of comfort that feels right for you."
       />
       <BloomSection />
+      <CollectionDirectory />
       <div className="collection-page-note">
         <p className="section-kicker">A NOTE FROM DAKSHA</p>
         <p>Every collection begins with the same thought: you deserve to feel comfortable, look like yourself, and stay within budget.</p>
@@ -655,15 +631,13 @@ function CarePage() {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => {
-    const route = window.location.hash.match(/^#\/([^?]*)/);
-    return route?.[1] || "home";
-  });
+  const getRoute = () => window.location.hash.replace(/^#\/?/, "").split("?")[0].split("/");
+  const [route, setRoute] = useState(getRoute);
+  const page = route[0] || "home";
 
   useEffect(() => {
     const syncPage = () => {
-      const route = window.location.hash.match(/^#\/([^?]*)/);
-      setPage(route?.[1] || "home");
+      setRoute(getRoute());
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
     window.addEventListener("hashchange", syncPage);
@@ -672,13 +646,19 @@ export default function App() {
 
   const pages = {
     home: <HomePage />,
-    shop: <ShopPage />,
+    shop: <ShopCatalogPage />,
     collections: <CollectionsPage />,
     gallery: <GalleryPage />,
     about: <AboutPage />,
     contact: <ContactPage />,
     care: <CarePage />,
   };
+
+  if (page === "admin") {
+    return route[1] === "login" ? <AdminLoginPage /> : <AdminDashboardPage />;
+  }
+  if (page === "collection" && route[1]) return <><PetalField /><SiteHeader page="collections" /><main id="main"><CollectionDetailPage slug={route[1]} /></main><SiteFooter /></>;
+  if (page === "product" && route[1]) return <><PetalField /><SiteHeader page="shop" /><main id="main"><ProductDetailPage slug={route[1]} /></main><SiteFooter /></>;
 
   return (
     <>
