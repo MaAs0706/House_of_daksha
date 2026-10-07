@@ -250,7 +250,7 @@ function SiteHeader({ page }) {
         <nav className="top-nav" aria-label="Main navigation">
           {links.map(([label, route]) => route === "shop" ? (
             <div className="nav-shop-item" key={route}>
-              <a href="#/shop" aria-current={page === "shop" ? "page" : undefined}>Shop <span aria-hidden="true">⌄</span></a>
+              <a href="#/shop" aria-current={page === "shop" ? "page" : undefined}>Shop <span className="nav-shop-chevron" aria-hidden="true" /></a>
               <div className="nav-shop-submenu">
                 {shopLinks.map(([subLabel, subRoute]) => <a href={`#/${subRoute}`} key={subRoute}>{subLabel}</a>)}
               </div>

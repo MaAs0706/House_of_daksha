@@ -30,8 +30,9 @@ a { color: inherit; }
 .top-nav a { color: #625f57; }
 .top-nav a:hover, .nav-note:hover { color: var(--olive); }
 .nav-shop-item { position: relative; padding: 20px 0; }
-.nav-shop-item > a { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #625f57; }
-.nav-shop-item > a span { color: var(--gold); font-size: 12px; }
+.nav-shop-item > a { height: 34px; display: inline-flex; align-items: center; gap: 7px; line-height: 1; text-decoration: none; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #625f57; }
+.nav-shop-item > a .nav-shop-chevron { width: 6px; height: 6px; margin-top: -3px; border-right: 1px solid var(--gold); border-bottom: 1px solid var(--gold); transform: rotate(45deg); transition: transform .2s, margin .2s; }
+.nav-shop-item:hover > a .nav-shop-chevron, .nav-shop-item:focus-within > a .nav-shop-chevron { margin-top: 3px; transform: rotate(225deg); }
 .nav-shop-item:hover > a, .nav-shop-item:focus-within > a { color: var(--olive); }
 .nav-shop-submenu { position: absolute; z-index: 12; top: calc(100% - 9px); left: -15px; min-width: 220px; padding: 8px; display: grid; border: 1px solid var(--rule); background: var(--cream); box-shadow: 0 14px 34px rgba(48,47,44,.12); opacity: 0; visibility: hidden; transform: translateY(7px); transition: opacity .2s, transform .2s, visibility .2s; }
 .nav-shop-item:hover .nav-shop-submenu, .nav-shop-item:focus-within .nav-shop-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
