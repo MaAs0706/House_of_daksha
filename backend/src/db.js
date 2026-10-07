@@ -34,6 +34,7 @@ export async function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS products (
       id TEXT PRIMARY KEY,
       collection_id TEXT REFERENCES collections(id) ON DELETE SET NULL,
+      category TEXT NOT NULL DEFAULT 'daily-wear',
       name TEXT NOT NULL,
       slug TEXT NOT NULL UNIQUE,
       description TEXT NOT NULL DEFAULT '',
@@ -51,5 +52,6 @@ export async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS products_collection_id_idx ON products(collection_id);
     CREATE INDEX IF NOT EXISTS products_published_idx ON products(is_published);
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'daily-wear';
   `);
 }

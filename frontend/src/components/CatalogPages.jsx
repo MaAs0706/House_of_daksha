@@ -16,11 +16,12 @@ function ProductCards({ products }) {
         <a className="catalog-product" href={`#/product/${product.slug}`} key={product.id}>
           <div className="catalog-product-image">
             {product.image_url ? <img src={product.image_url} alt={product.name} loading="lazy" /> : <span>✿</span>}
-            <span className="catalog-product-open">VIEW THE DRESS ↗</span>
+            {Number(product.compare_at_price) > Number(product.price) && <span className="catalog-sale-badge">ON SALE</span>}
+            <span className="catalog-product-open">VIEW THIS PIECE ↗</span>
           </div>
           <div className="catalog-product-meta">
             <div><h2>{product.name}</h2><p>{product.collection_name || "HOUSE OF DAKSHA"}</p></div>
-            <strong>{formatPrice(product.price)}</strong>
+            <strong>{formatPrice(product.price)} {Number(product.compare_at_price) > Number(product.price) && <del>{formatPrice(product.compare_at_price)}</del>}</strong>
           </div>
         </a>
       ))}
@@ -28,24 +29,47 @@ function ProductCards({ products }) {
   );
 }
 
-export function ShopCatalogPage() {
+const SHOP_CATEGORY_INFO = {
+  "daily-wear": {
+    title: "Effortless Everyday Cottons",
+    accent: "Daily wear Kurti / Dresses",
+    description: "Breathable, handpicked cotton dresses designed for all-day comfort. From morning meetings to evening errands, stay light, comfortable, and polished without breaking your budget.",
+  },
+  "co-ord-sets": {
+    title: "Matching Style,",
+    accent: "Zero Hassle",
+    description: "Perfectly paired cotton co-ords for work, travel, and casual outings. Easy to style, soft on the skin, and tailored for effortless daily elegance.",
+  },
+  "maternity-wear": {
+    title: "Comfort & Confidence",
+    accent: "for New Moms",
+    description: "Soft, budget-friendly outerwear crafted for expectant and new mothers. Thoughtfully designed to give you flattering fits, easy movement, and total confidence whenever you step out.",
+  },
+};
+
+export function ShopCatalogPage({ category = "", onSale = false }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   useEffect(() => {
-    apiRequest("/products")
+    setLoading(true);
+    setError("");
+    setProducts([]);
+    const query = onSale ? "?on_sale=true" : category ? `?category=${encodeURIComponent(category)}` : "";
+    apiRequest(`/products${query}`)
       .then((data) => setProducts(data.products || []))
       .catch((requestError) => setError(requestError.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [category, onSale]);
+  const info = SHOP_CATEGORY_INFO[category];
   return (
     <div className="inner-page shop-page">
       <header className="inner-page-intro">
-        <p className="section-kicker">THE HOUSE OF DAKSHA SHOP</p>
-        <h1>Good clothes for<br /><em>the life you live.</em></h1>
-        <p>Thoughtfully handpicked cotton dresses, easy co-ords and comfortable maternity wear—made for workdays, slow mornings and everything between.</p>
+        <p className="section-kicker">{onSale ? "A LITTLE SOMETHING FOR LESS" : info ? "A HOUSE OF DAKSHA EDIT" : "THE HOUSE OF DAKSHA SHOP"}</p>
+        <h1>{onSale ? <>Good things,<br /><em>softer prices.</em></> : info ? <>{info.title}<br /><em>{info.accent}</em></> : <>Good clothes for<br /><em>the life you live.</em></>}</h1>
+        <p>{onSale ? "Thoughtfully handpicked pieces, now at special prices. Find a little more room in your wardrobe and your budget." : info?.description || "Thoughtfully handpicked cotton dresses, easy co-ords and comfortable maternity wear—made for workdays, slow mornings and everything between."}</p>
       </header>
-      <PageState loading={loading} error={error} empty={!products.length && !loading && !error ? "The first pieces are being prepared. Come back soon." : ""}>
+      <PageState loading={loading} error={error} empty={!products.length && !loading && !error ? onSale ? "No pieces are on sale right now. Check back for the next little treat." : "The first pieces are being prepared. Come back soon." : ""}>
         <ProductCards products={products} />
       </PageState>
       <a className="shop-gallery-link" href="#/gallery">See the pieces in real life <span aria-hidden="true">↗</span></a>
@@ -130,7 +154,7 @@ export function ProductDetailPage({ slug }) {
         <article className="product-detail-copy">
           <p className="section-kicker">{product.collection_name || "HOUSE OF DAKSHA"}</p>
           <h1>{product.name}</h1>
-          <p className="product-detail-price">{formatPrice(product.price)}</p>
+          <p className="product-detail-price">{formatPrice(product.price)} {Number(product.compare_at_price) > Number(product.price) && <del>{formatPrice(product.compare_at_price)}</del>}</p>
           <p className="product-detail-description">{product.description}</p>
           {product.sizes?.length > 0 && <div className="product-detail-field"><span>AVAILABLE SIZES</span><p>{product.sizes.join(" · ")}</p></div>}
           {product.fabric && <div className="product-detail-field"><span>FABRIC</span><p>{product.fabric}</p></div>}

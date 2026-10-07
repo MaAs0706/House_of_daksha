@@ -191,19 +191,25 @@ function SiteHeader({ page }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuToggleRef = useRef(null);
   const menuCloseRef = useRef(null);
+  const shopLinks = [
+    ["Daily wear Kurti / Dresses", "shop/daily-wear"],
+    ["Co-Ord Sets", "shop/co-ord-sets"],
+    ["Maternity Wear", "shop/maternity-wear"],
+    ["All collections", "collections"],
+  ];
   const links = [
     ["Home", "home"],
     ["Shop", "shop"],
-    ["Collections", "collections"],
+    ["On Sale!", "sale"],
+    ["About Us", "about"],
+    ["Contact Us", "contact"],
+    ["Product Care", "care"],
     ["Gallery", "gallery"],
-    ["About us", "about"],
-    ["Contact", "contact"],
-    ["Product care", "care"],
   ];
-  const flowingItems = [...links, ["Admin login", "admin/login"]].map(([text, route], index) => ({
+  const flowingItems = [...links.slice(0, 2), ...shopLinks, ...links.slice(2), ["Admin login", "admin/login"]].map(([text, route], index) => ({
     text,
     link: `#/${route}`,
-    image: asset(`gallery/look-${String(index === 6 ? 12 : index + 1).padStart(2, "0")}.jpg`),
+    image: asset(`gallery/look-${String(index === 10 ? 12 : (index % 12) + 1).padStart(2, "0")}.jpg`),
   }));
 
   useEffect(() => {
@@ -242,7 +248,14 @@ function SiteHeader({ page }) {
           <span className="brand-caption">A HOUSE FOR EVERY CHAPTER</span>
         </a>
         <nav className="top-nav" aria-label="Main navigation">
-          {links.map(([label, route]) => (
+          {links.map(([label, route]) => route === "shop" ? (
+            <div className="nav-shop-item" key={route}>
+              <a href="#/shop" aria-current={page === "shop" ? "page" : undefined}>Shop <span aria-hidden="true">⌄</span></a>
+              <div className="nav-shop-submenu">
+                {shopLinks.map(([subLabel, subRoute]) => <a href={`#/${subRoute}`} key={subRoute}>{subLabel}</a>)}
+              </div>
+            </div>
+          ) : (
             <a href={`#/${route}`} key={route} aria-current={route === page ? "page" : undefined}>{label}</a>
           ))}
         </nav>
@@ -478,16 +491,8 @@ function StorySection() {
           <br />
           <small>ask you to</small> <em>choose?</em>
         </h2>
-        <p>
-          Everyday clothes were making us pick: quality or affordability.
-          Comfort or feeling put-together. We thought you deserved all of it.
-        </p>
-        <p>
-          So we began handpicking soft cottons and easy silhouettes for work,
-          errands, slow mornings and the chapters that change everything. No
-          fuss. No special occasion needed. Just clothes that feel good to live
-          in.
-        </p>
+        <p>House of Daksha was founded on a simple realization: everyday wardrobe staples often sacrifice either quality, comfort, or affordability. We set out to create a brand that bridges that gap.</p>
+        <p>By sourcing premium, handpicked cotton fabrics and focusing on timeless, versatile silhouettes, we deliver soft, skin-friendly outfits that handle the demands of daily wear—without the high price markups.</p>
         <div className="handwritten-note">
           Here’s to feeling like yourself.
           <br />
@@ -568,10 +573,11 @@ function SiteFooter() {
       <p>Handpicked for the life you live.</p>
       <nav aria-label="Footer navigation">
         <a href="#/shop">Shop</a>
+        <a href="#/sale">On Sale!</a>
         <a href="#/collections">Collections</a>
         <a href="#/gallery">Gallery</a>
-        <a href="#/about">About us</a>
-        <a href="#/contact">Contact</a>
+        <a href="#/about">About Us</a>
+        <a href="#/contact">Contact Us</a>
         <a href="#/care">Product care</a>
         <a href="#/admin/login">Admin</a>
       </nav>
@@ -599,6 +605,17 @@ function HomePage({ introActive = false }) {
         <em>Just dressed like yourself.</em>
         <span className="breath-flower" aria-hidden="true">✿</span>
       </section>
+      <section className="home-brand-intro">
+        <div className="home-brand-heading">
+          <p className="section-kicker">HOUSE OF DAKSHA</p>
+          <h2>Thoughtfully handpicked cottons.<br /><em>Confident maternity wear.</em></h2>
+        </div>
+        <div className="home-brand-copy">
+          <p>We were founded on a simple realization: everyday wardrobe staples often sacrifice either quality, comfort, or affordability. We curate breathable, everyday cotton clothing designed to move with you through every chapter of your day—from bustling work routines and daily errands to the life-changing journey of new motherhood.</p>
+          <p>Every piece in our store is chosen with real life in mind: practical maintenance, skin-friendly feel, flattering fits, and price tags that keep effortless style accessible to everyone.</p>
+        </div>
+      </section>
+      <HomeShopCategories />
       <section className="home-discover">
         <div>
           <p className="section-kicker">A LITTLE LOOK AROUND</p>
@@ -610,6 +627,33 @@ function HomePage({ introActive = false }) {
       <MotherhoodSection />
       <ClosingSection />
     </>
+  );
+}
+
+function HomeShopCategories() {
+  const categories = [
+    ["01", "Daily wear Kurti / Dresses", "Effortless Everyday Cottons", "Breathable, handpicked cotton dresses designed for all-day comfort. From morning meetings to evening errands, stay light, comfortable, and polished without breaking your budget.", "daily-wear"],
+    ["02", "Co-Ord Sets", "Matching Style, Zero Hassle", "Perfectly paired cotton co-ords for work, travel, and casual outings. Easy to style, soft on the skin, and tailored for effortless daily elegance.", "co-ord-sets"],
+    ["03", "Maternity Wear", "Comfort & Confidence for New Moms", "Soft, budget-friendly outerwear crafted for expectant and new mothers. Thoughtfully designed to give you flattering fits, easy movement, and total confidence whenever you step out.", "maternity-wear"],
+  ];
+  return (
+    <section className="home-shop-section">
+      <header className="home-shop-heading">
+        <div><p className="section-kicker">MADE FOR YOUR EVERYDAY</p><h2>Find your kind<br /><em>of comfort.</em></h2></div>
+        <a className="sale-note" href="#/sale"><span>THE DAKSHA SALE</span><strong>A little more lovely<br />for a little less. ↗</strong></a>
+      </header>
+      <div className="home-category-grid">
+        {categories.map(([number, label, title, description, slug]) => (
+          <a className="home-category-card" href={`#/shop/${slug}`} key={slug}>
+            <span className="home-category-number">{number} <i>✳</i></span>
+            <span className="home-category-label">{label}</span>
+            <h3>{title}</h3>
+            <p>{description}</p>
+            <b>EXPLORE THIS EDIT <span aria-hidden="true">↗</span></b>
+          </a>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -647,10 +691,17 @@ function AboutPage() {
       <PageIntro
         kicker="THE THOUGHT BEHIND THE CLOTHES"
         title="Comfort, confidence"
-        accent="and a little room."
-        description="House of Daksha is here for the everyday and the life-changing—with handpicked cottons and easy silhouettes that feel good to live in."
+        accent="and everyday value."
+        description="We set out to bridge the gap between quality, comfort, and affordability. By sourcing premium, handpicked cotton fabrics and choosing timeless, versatile silhouettes, we make soft, skin-friendly outfits for daily life—without high price markups."
       />
       <StorySection />
+      <section className="about-offers">
+        <p className="section-kicker">WHAT WE OFFER</p>
+        <div className="about-offer-grid">
+          <article><span aria-hidden="true">🌿</span><p className="section-kicker">HANDPICKED DAILY COTTONS &amp; CO-ORD SETS</p><h2>Easy mornings.<br /><em>Put-together days.</em></h2><p>Whether you need an easy workday look, a polished co-ord set for meetings, or a relaxed dress for casual outings, our daily wear collection focuses on lightweight breathability, clean tailoring, and all-day comfort.</p><a href="#/shop">Explore daily wear ↗</a></article>
+          <article><span aria-hidden="true">🤱</span><p className="section-kicker">CONFIDENT, BUDGET-FRIENDLY MATERNITY WEAR</p><h2>Room to grow.<br /><em>Room to be you.</em></h2><p>Motherhood brings incredible change, but your sense of style shouldn't have to take a back seat. Our maternity collection is thoughtfully crafted for flattering, comfortable, easy-to-wear outfits that boost confidence at prices that make sense for a growing family.</p><a href="#/shop/maternity-wear">Explore maternity wear ↗</a></article>
+        </div>
+      </section>
       <div className="about-values">
         <p><span>01</span><strong>Comfort first.</strong> Breathable fabrics and shapes made for moving through your day.</p>
         <p><span>02</span><strong>Thoughtfully chosen.</strong> Versatile pieces you can make your own, again and again.</p>
@@ -686,17 +737,17 @@ function CarePage() {
   return (
     <div className="inner-page care-page">
       <PageIntro
-        kicker="A LITTLE CARE GOES A LONG WAY"
-        title="Keep the good"
-        accent="days going."
-        description="A few gentle habits can help your cotton pieces stay soft, comfortable and ready for another day out."
+        kicker="PRODUCT CARE"
+        title="How to care for"
+        accent="your House of Daksha cottons."
+        description="Our handpicked cottons are chosen for pure comfort and daily durability. A few gentle habits keep them soft, vibrant, and fitting beautifully wash after wash."
       />
       <div className="care-list">
         {[
-          ["01", "Read the garment label", "Care instructions can vary by fabric and finish, so check the label before washing."],
-          ["02", "Wash gently", "Use a gentle cycle and cool water where the care label allows. Wash similar colours together."],
-          ["03", "Let it dry in the shade", "Air-drying helps cotton keep its colour and feel. Avoid prolonged direct sunlight."],
-          ["04", "Press with care", "Use a low to medium iron setting, following the garment label. Turn detailed prints inside out."],
+          ["01", "Keep it cool", "Wash in cold water using a gentle, mild detergent."],
+          ["02", "Shade is your friend", "Dry in the shade to protect the rich color pigments."],
+          ["03", "Gentle care", "Avoid tumble drying on high heat to help prevent fabric shrinkage."],
+          ["04", "Iron inside out", "A quick warm iron on the reverse side brings back the crisp, fresh look effortlessly."],
         ].map(([number, title, copy]) => (
           <article className="care-step" key={number}>
             <span>{number}</span><div><h2>{title}</h2><p>{copy}</p></div>
@@ -727,7 +778,8 @@ export default function App() {
 
   const pages = {
     home: <HomePage introActive={showIntro} />,
-    shop: <ShopCatalogPage />,
+    shop: <ShopCatalogPage category={route[1] || ""} />,
+    sale: <ShopCatalogPage onSale />,
     collections: <CollectionsPage />,
     gallery: <GalleryPage />,
     about: <AboutPage />,

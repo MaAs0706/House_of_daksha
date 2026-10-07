@@ -101,7 +101,7 @@ function ImageField({ label, kind, imageUrl, imagePublicId, onChange }) {
 }
 
 const emptyCollection = { name: "", slug: "", description: "", image_url: "", image_public_id: "", is_published: false, sort_order: 0 };
-const emptyProduct = { name: "", slug: "", collection_id: "", description: "", price: "", compare_at_price: "", sizes: "", fabric: "", care: "", image_url: "", image_public_id: "", is_published: false };
+const emptyProduct = { name: "", slug: "", collection_id: "", category: "daily-wear", description: "", price: "", compare_at_price: "", sizes: "", fabric: "", care: "", image_url: "", image_public_id: "", is_published: false };
 
 function CollectionForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(initial || emptyCollection);
@@ -151,8 +151,9 @@ function ProductForm({ initial, collections, onSave, onCancel }) {
         <label>Dress name<input value={form.name} onChange={(event) => set("name", event.target.value)} required maxLength="160" /></label>
         <label>URL slug<input placeholder="Created from the name if blank" value={form.slug} onChange={(event) => set("slug", event.target.value)} /></label>
         <label>Collection<select value={form.collection_id || ""} onChange={(event) => set("collection_id", event.target.value)}><option value="">No collection</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.name}</option>)}</select></label>
+        <label>Shop category<select value={form.category || "daily-wear"} onChange={(event) => set("category", event.target.value)}><option value="daily-wear">Daily wear Kurti / Dresses</option><option value="co-ord-sets">Co-Ord Sets</option><option value="maternity-wear">Maternity Wear</option></select></label>
         <label>Price (₹)<input inputMode="decimal" type="number" min="0" step="0.01" value={form.price} onChange={(event) => set("price", event.target.value)} required /></label>
-        <label>Original price (₹)<input inputMode="decimal" type="number" min="0" step="0.01" value={form.compare_at_price ?? ""} onChange={(event) => set("compare_at_price", event.target.value)} /></label>
+        <label>Original price (₹)<small>Set higher than the sale price to show this piece under On Sale.</small><input inputMode="decimal" type="number" min="0" step="0.01" value={form.compare_at_price ?? ""} onChange={(event) => set("compare_at_price", event.target.value)} /></label>
         <label>Sizes <small>Separate sizes with commas</small><input placeholder="S, M, L, XL" value={form.sizes || ""} onChange={(event) => set("sizes", event.target.value)} /></label>
         <label className="admin-full-field">Description<textarea rows="5" value={form.description || ""} onChange={(event) => set("description", event.target.value)} maxLength="6000" /></label>
         <label>Fabric<input placeholder="For example, handpicked cotton" value={form.fabric || ""} onChange={(event) => set("fabric", event.target.value)} maxLength="160" /></label>
@@ -260,7 +261,7 @@ function ItemList({ items, type, onEdit, onRemove }) {
   if (!items.length) return <div className="admin-empty"><span>✿</span><h3>Nothing here just yet.</h3><p>Add your first {type === "product" ? "dress" : "collection"} to begin building the shop.</p></div>;
   return <div className="admin-item-list">{items.map((item) => <article className="admin-item-row" key={item.id}>
     <div className="admin-item-thumb">{item.image_url ? <img src={item.image_url} alt="" /> : <span>✿</span>}</div>
-    <div className="admin-item-info"><h3>{item.name}</h3><p>{type === "product" ? `${formatPrice(item.price)} · ${item.collection_name || "Unassigned"}` : `${item.product_count || 0} dresses · /${item.slug}`}</p></div>
+    <div className="admin-item-info"><h3>{item.name}</h3><p>{type === "product" ? `${formatPrice(item.price)} · ${item.category?.replaceAll("-", " ") || "daily wear"} · ${item.collection_name || "Unassigned"}` : `${item.product_count || 0} dresses · /${item.slug}`}</p></div>
     <span className={`admin-status ${item.is_published ? "is-live" : ""}`}>{item.is_published ? "Published" : "Draft"}</span>
     {type === "product" && item.is_published && <a className="admin-item-view" href={`#/product/${item.slug}`} target="_blank" rel="noreferrer">View</a>}
     <button className="admin-text-button" onClick={() => onEdit(item)}>Edit</button>

@@ -76,6 +76,7 @@ const normalizedSizes = (value) => {
   if (typeof value === "string") return value.split(",").map((size) => size.trim()).filter(Boolean).slice(0, 30);
   return [];
 };
+const PRODUCT_CATEGORIES = new Set(["daily-wear", "co-ord-sets", "maternity-wear"]);
 
 api.get("/health", (_req, res) => res.json({ status: "ok" }));
 
@@ -131,7 +132,7 @@ api.get("/collections/:slug", async (req, res, next) => {
 });
 
 const PUBLIC_PRODUCT_SELECT = `
-  SELECT p.id, p.name, p.slug, p.description, p.price_paise / 100.0 AS price,
+  SELECT p.id, p.category, p.name, p.slug, p.description, p.price_paise / 100.0 AS price,
          p.compare_at_price_paise / 100.0 AS compare_at_price, p.sizes, p.fabric, p.care,
          p.image_url, p.collection_id, c.name AS collection_name, c.slug AS collection_slug
   FROM products p LEFT JOIN collections c ON c.id = p.collection_id
@@ -145,6 +146,13 @@ api.get("/products", async (req, res, next) => {
       params.push(String(req.query.collection));
       where += ` AND c.slug = $${params.length}`;
     }
+    if (req.query.category) {
+      const category = String(req.query.category);
+      if (!PRODUCT_CATEGORIES.has(category)) return res.status(400).json({ error: "Choose a valid shop category." });
+      params.push(category);
+      where += ` AND p.category = $${params.length}`;
+    }
+    if (req.query.on_sale === "true") where += " AND p.compare_at_price_paise > p.price_paise";
     const { rows } = await pool.query(`${PUBLIC_PRODUCT_SELECT} ${where} ORDER BY p.created_at DESC`, params);
     res.json({ products: rows });
   } catch (error) { next(error); }
@@ -214,7 +222,7 @@ api.delete("/admin/collections/:id", async (req, res, next) => {
 api.get("/admin/products", async (_req, res, next) => {
   try {
     const { rows } = await pool.query(`
-      SELECT p.id, p.collection_id, p.name, p.slug, p.description,
+      SELECT p.id, p.collection_id, p.category, p.name, p.slug, p.description,
              p.price_paise / 100.0 AS price, p.compare_at_price_paise / 100.0 AS compare_at_price,
              p.sizes, p.fabric, p.care, p.image_url, p.image_public_id,
              p.is_published, p.created_at, p.updated_at,
@@ -232,18 +240,21 @@ api.post("/admin/products", async (req, res, next) => {
     const slug = slugify(req.body?.slug || name);
     const price = rupeesToPaise(req.body?.price);
     const compareAt = req.body?.compare_at_price === "" || req.body?.compare_at_price == null ? null : rupeesToPaise(req.body.compare_at_price);
+    const category = String(req.body?.category || "daily-wear");
     if (name.length < 2 || name.length > 160 || !slug || price == null || (req.body?.compare_at_price && compareAt == null)) {
       return res.status(400).json({ error: "Add a product name and valid price." });
     }
+    if (!PRODUCT_CATEGORIES.has(category)) return res.status(400).json({ error: "Choose a valid shop category." });
+    if (compareAt != null && compareAt <= price) return res.status(400).json({ error: "Original price must be higher than sale price." });
     const collectionId = req.body.collection_id || null;
     if (collectionId) {
       const collection = await pool.query("SELECT id FROM collections WHERE id=$1", [collectionId]);
       if (!collection.rows[0]) return res.status(400).json({ error: "Choose a valid collection." });
     }
     const { rows } = await pool.query(`
-      INSERT INTO products (id, collection_id, name, slug, description, price_paise, compare_at_price_paise, sizes, fabric, care, image_url, image_public_id, is_published)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12,$13) RETURNING *
-    `, [randomUUID(), collectionId, name, slug, String(req.body.description || "").slice(0, 6000), price, compareAt, JSON.stringify(normalizedSizes(req.body.sizes)), String(req.body.fabric || "").slice(0, 160), String(req.body.care || "").slice(0, 2000), String(req.body.image_url || ""), String(req.body.image_public_id || ""), boolValue(req.body.is_published)]);
+      INSERT INTO products (id, collection_id, category, name, slug, description, price_paise, compare_at_price_paise, sizes, fabric, care, image_url, image_public_id, is_published)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10,$11,$12,$13,$14) RETURNING *
+    `, [randomUUID(), collectionId, category, name, slug, String(req.body.description || "").slice(0, 6000), price, compareAt, JSON.stringify(normalizedSizes(req.body.sizes)), String(req.body.fabric || "").slice(0, 160), String(req.body.care || "").slice(0, 2000), String(req.body.image_url || ""), String(req.body.image_public_id || ""), boolValue(req.body.is_published)]);
     res.status(201).json({ product: rows[0] });
   } catch (error) { next(error); }
 });
@@ -259,17 +270,20 @@ api.patch("/admin/products/:id", async (req, res, next) => {
     const compareAt = req.body?.compare_at_price === undefined
       ? current.compare_at_price_paise
       : req.body.compare_at_price === "" || req.body.compare_at_price == null ? null : rupeesToPaise(req.body.compare_at_price);
+    const category = String(req.body?.category ?? current.category ?? "daily-wear");
     if (!name || !slug || price == null || (req.body?.compare_at_price && compareAt == null)) return res.status(400).json({ error: "Add a product name and valid price." });
+    if (!PRODUCT_CATEGORIES.has(category)) return res.status(400).json({ error: "Choose a valid shop category." });
+    if (compareAt != null && compareAt <= price) return res.status(400).json({ error: "Original price must be higher than sale price." });
     const collectionId = req.body?.collection_id === undefined ? current.collection_id : req.body.collection_id || null;
     if (collectionId) {
       const collection = await pool.query("SELECT id FROM collections WHERE id=$1", [collectionId]);
       if (!collection.rows[0]) return res.status(400).json({ error: "Choose a valid collection." });
     }
     const { rows } = await pool.query(`
-      UPDATE products SET collection_id=$2, name=$3, slug=$4, description=$5, price_paise=$6,
-        compare_at_price_paise=$7, sizes=$8::jsonb, fabric=$9, care=$10, image_url=$11,
-        image_public_id=$12, is_published=$13, updated_at=NOW() WHERE id=$1 RETURNING *
-    `, [current.id, collectionId, name, slug, String(req.body?.description ?? current.description).slice(0, 6000), price, compareAt, JSON.stringify(normalizedSizes(req.body?.sizes ?? current.sizes)), String(req.body?.fabric ?? current.fabric).slice(0, 160), String(req.body?.care ?? current.care).slice(0, 2000), String(req.body?.image_url ?? current.image_url), String(req.body?.image_public_id ?? current.image_public_id), boolValue(req.body?.is_published, current.is_published)]);
+      UPDATE products SET collection_id=$2, category=$3, name=$4, slug=$5, description=$6, price_paise=$7,
+        compare_at_price_paise=$8, sizes=$9::jsonb, fabric=$10, care=$11, image_url=$12,
+        image_public_id=$13, is_published=$14, updated_at=NOW() WHERE id=$1 RETURNING *
+    `, [current.id, collectionId, category, name, slug, String(req.body?.description ?? current.description).slice(0, 6000), price, compareAt, JSON.stringify(normalizedSizes(req.body?.sizes ?? current.sizes)), String(req.body?.fabric ?? current.fabric).slice(0, 160), String(req.body?.care ?? current.care).slice(0, 2000), String(req.body?.image_url ?? current.image_url), String(req.body?.image_public_id ?? current.image_public_id), boolValue(req.body?.is_published, current.is_published)]);
     if (current.image_public_id && current.image_public_id !== rows[0].image_public_id) deleteImage(current.image_public_id).catch(console.error);
     res.json({ product: rows[0] });
   } catch (error) { next(error); }
