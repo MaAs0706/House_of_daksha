@@ -52,9 +52,19 @@ function MenuItem({
   useEffect(() => {
     const calculateRepetitions = () => {
       if (!marqueeInnerRef.current) return;
+      const touchFirst = window.matchMedia?.("(hover: none), (pointer: coarse)").matches;
+      if (touchFirst) {
+        setRepetitions(1);
+        return;
+      }
       const part = marqueeInnerRef.current.querySelector(".marquee__part");
-      if (!part) return;
-      setRepetitions(Math.max(4, Math.ceil(window.innerWidth / part.offsetWidth) + 2));
+      const partWidth = part?.getBoundingClientRect().width;
+      if (!Number.isFinite(partWidth) || partWidth <= 0) {
+        setRepetitions(1);
+        return;
+      }
+      const count = Math.ceil(window.innerWidth / partWidth) + 2;
+      setRepetitions(Math.max(4, Math.min(32, Number.isFinite(count) ? count : 4)));
     };
     calculateRepetitions();
     window.addEventListener("resize", calculateRepetitions);
@@ -62,6 +72,9 @@ function MenuItem({
   }, [text, image]);
 
   useEffect(() => {
+    // Touch menus do not need an idle marquee loop. Keeping every row animating
+    // in the background can overwhelm mobile browsers before the menu is usable.
+    if (window.matchMedia?.("(hover: none), (pointer: coarse)").matches) return undefined;
     const timer = window.setTimeout(() => {
       const part = marqueeInnerRef.current?.querySelector(".marquee__part");
       if (!part || !part.offsetWidth || !marqueeInnerRef.current) return;
@@ -86,6 +99,7 @@ function MenuItem({
   };
 
   const showMarquee = (event) => {
+    if (window.matchMedia?.("(hover: none), (pointer: coarse)").matches) return;
     if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
     const rect = itemRef.current.getBoundingClientRect();
     const x = Number.isFinite(event.clientX) ? event.clientX - rect.left : rect.width / 2;
@@ -98,6 +112,7 @@ function MenuItem({
   };
 
   const hideMarquee = (event) => {
+    if (window.matchMedia?.("(hover: none), (pointer: coarse)").matches) return;
     if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
     const rect = itemRef.current.getBoundingClientRect();
     const x = Number.isFinite(event.clientX) ? event.clientX - rect.left : rect.width / 2;

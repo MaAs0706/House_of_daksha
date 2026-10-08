@@ -791,12 +791,13 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
 }
 
 @media (max-width: 650px) {
-  .mobile-flow-overlay { height: 100vh; height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
-  .mobile-flow-head { height: 72px; min-height: 72px; flex-basis: 72px; }
-  .menu-wrap { height: auto; min-height: 0; flex: 1 1 auto; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
-  .menu { height: auto; min-height: 100%; justify-content: flex-start; }
-  .menu__item { flex: 0 0 60px; min-height: 60px; }
-  .menu__item-link { justify-content: center; padding: 0 18px; font-size: 19px; letter-spacing: .07em; }
+  .mobile-flow-overlay { position: fixed !important; z-index: 100 !important; inset: 0 !important; width: 100%; height: 100vh !important; height: 100dvh !important; min-height: 100vh; display: flex !important; flex-direction: column; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); background: var(--paper); isolation: isolate; }
+  .mobile-flow-head { position: relative; z-index: 2; width: 100%; height: 72px; min-height: 72px; flex: 0 0 72px; visibility: visible !important; opacity: 1 !important; background: var(--paper); }
+  .mobile-flow-brand, .mobile-flow-close { visibility: visible !important; opacity: 1 !important; }
+  .menu-wrap { position: relative; z-index: 1; width: 100%; height: auto !important; min-height: 0; flex: 1 1 0%; display: block; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; background: var(--paper); }
+  .menu { width: 100%; height: auto !important; min-height: 100%; display: flex; flex-direction: column; justify-content: flex-start; }
+  .menu__item { width: 100%; flex: 0 0 60px; min-height: 60px; visibility: visible !important; opacity: 1 !important; }
+  .menu__item-link { width: 100%; justify-content: center; padding: 0 18px; color: var(--ink) !important; font-size: 19px; letter-spacing: .07em; }
   .menu__item:nth-child(3), .menu__item:nth-child(4), .menu__item:nth-child(5), .menu__item:nth-child(6) { flex-basis: 47px; min-height: 47px; background: rgba(104,116,90,.035); }
   .menu__item:nth-child(3) .menu__item-link,
   .menu__item:nth-child(4) .menu__item-link,
