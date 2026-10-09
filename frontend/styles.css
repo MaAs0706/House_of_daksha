@@ -807,3 +807,14 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
   .menu__item:nth-child(5) .marquee, .menu__item:nth-child(6) .marquee { display: none; }
   .marquee__part span { font-size: 19px; }
 }
+
+@media (max-width: 760px) {
+  .home-shop-section { padding: 60px 20px 68px; }
+  .home-category-grid { width: 100%; grid-template-columns: minmax(0, 1fr); }
+  .home-category-card, .home-category-card:first-child { min-width: 0; min-height: 0; padding: 25px 16px 23px; border-right: 0; border-left: 0; border-bottom: 1px solid rgba(114,111,95,.28); }
+  .home-category-card:last-child { border-bottom: 0; }
+  .home-category-label { margin-top: 16px; }
+  .home-category-card h3 { max-width: 18ch; margin: 9px 0 11px; font-size: clamp(27px, 7vw, 34px); line-height: 1.08; }
+  .home-category-card p { max-width: 38em; margin-bottom: 12px; font-size: 12px; line-height: 1.75; }
+  .home-category-card > b { margin-top: 6px; font-size: 8px; }
+}
