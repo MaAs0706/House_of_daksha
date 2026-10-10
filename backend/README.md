@@ -1,39 +1,41 @@
-# House of Daksha API
+# House of Daksha API (FastAPI)
 
-The API stores collection and dress records in PostgreSQL, serves published catalog data, and keeps admin images in Cloudinary.
+The Python API preserves the storefront's `/api` routes and response shapes. It stores collections, products, and admin records in Supabase Postgres, signs the admin session cookie, and uploads product photos to Cloudinary.
 
-## Local setup
+## Run locally
 
-1. Create a PostgreSQL database and a Cloudinary account.
-2. Copy `.env.example` to `.env` and set `DATABASE_URL`, a random `JWT_SECRET` of at least 32 characters, and the three Cloudinary credentials. Set `WEB_ORIGIN` to the exact frontend origin (for example, `http://localhost:5173`).
-3. Install and start the API:
+1. Install Python 3.11 or newer and create a Cloudinary account.
+2. In this directory, copy `.env.example` to `.env`. Set `DATABASE_URL`, a `JWT_SECRET` with at least 32 characters, the exact frontend `WEB_ORIGIN`, and Cloudinary credentials. Use the Supabase session-pooler URI for hosted deployments.
+3. Install and run the API:
 
    ```sh
    cd backend
-   npm install
-   npm run dev
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   uvicorn main:app --reload --host 0.0.0.0 --port 4000
    ```
 
-   The API creates its tables on startup.
+   The API creates its tables at startup. The Vite frontend proxies `/api` to port 4000 in development.
 4. In another terminal, create the first admin account:
 
    ```sh
    cd backend
-   npm run admin:create
+   source .venv/bin/activate
+   python scripts/create_admin.py admin@example.com
    ```
 
-5. Start the frontend with `cd frontend && npm install && npm run dev`; open `#/admin/login` to manage the store.
+   It prompts for the password. Open the storefront at `#/admin/login`.
 
-The frontend proxies `/api` to `http://localhost:4000` during local development. For deployment, set `VITE_API_BASE_URL` to the API origin if it differs from the website origin, set `WEB_ORIGIN` to the deployed site origin, and use HTTPS. Keep `.env` and all provider secrets out of source control.
+## Deploy the API to Railway
 
-## Production setup with Supabase and Render
+1. Create a Railway project from this repository and add a service using the `backend` directory as its root. Railway detects `requirements.txt`; use `uvicorn main:app --host 0.0.0.0 --port $PORT` as the start command.
+2. Add these Railway variables: `DATABASE_URL`, `DATABASE_SSL=true`, `DATABASE_POOL_SIZE=5`, `JWT_SECRET` (a random value of at least 32 characters), `WEB_ORIGIN` (the exact Vercel site origin), `NODE_ENV=production`, `COOKIE_SAME_SITE=none`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`.
+3. Generate a Railway public domain, then set `VITE_API_BASE_URL` in the Vercel frontend project to that API origin and redeploy the frontend. The health endpoint is `/api/health`.
+4. In Railway's service shell, run `python scripts/create_admin.py your-admin-email`. Enter the password at the prompt.
 
-1. In Supabase, open **Connect → Session pooler** and copy the PostgreSQL URI. Session pooling supports persistent Node servers on IPv4 networks; keep the URI private.
-2. In Render, create a **Blueprint** from this repository and select `render.yaml`. Render will create the API service from `backend` and prompt for `DATABASE_URL`, `WEB_ORIGIN`, and the Cloudinary credentials. The blueprint generates `JWT_SECRET` and sets PostgreSQL SSL, a small connection pool, and the API health check.
-3. Set `WEB_ORIGIN` to the exact deployed frontend origin, including `https://` and without a trailing slash. Add the deployed API origin as `VITE_API_BASE_URL` in the frontend host, then rebuild/redeploy the frontend.
-4. After the API is healthy, open its Render Shell and run `npm run admin:create -- your-admin-email`. Enter the admin password at the prompt; do not put it in source control.
-5. Open `https://<api-origin>/api/health` and confirm it returns `{"status":"ok"}`, then sign in at `#/admin/login` on the storefront.
+Keep all database, signing, and Cloudinary secrets in the hosting provider's environment settings. A custom API subdomain can later be pointed to the Railway service without changing the database.
 
 ## Admin workflow
 
-Create and publish a collection, then add dresses and assign them to that collection. Published collections appear on the Collections page; published dresses appear in Shop and their collection page. Each dress has a dedicated detail page with its price, description, sizes, fabric, care instructions, and photo.
+Create and publish a collection, then add dresses and assign them to that collection. Published collections appear on the Collections page; published dresses appear in Shop and the matching collection page. Each dress has a detail page with its price, description, sizes, fabric, care instructions, and photo.

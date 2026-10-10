@@ -5,3 +5,6 @@ frontend/assets/source-photos/
 frontend/assets/unused-assets/
 backend/node_modules/
 backend/.env
+backend/.venv/
+backend/__pycache__/
+backend/scripts/__pycache__/
