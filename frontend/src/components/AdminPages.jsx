@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiRequest, formatPrice } from "../lib/api.js";
 
-// Temporary dashboard preview. Enable explicitly in hosted builds until the API is deployed.
-const ADMIN_TEST_MODE = import.meta.env.DEV || import.meta.env.VITE_ADMIN_TEST_MODE === "true";
-
 function AdminBrand() {
   return <a className="admin-brand" href="#/home">HOUSE <i>OF</i> DAKSHA <span>✳</span></a>;
 }
@@ -15,7 +12,6 @@ export function AdminLoginPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (ADMIN_TEST_MODE) return;
     apiRequest("/auth/me").then(() => { window.location.hash = "#/admin"; }).catch(() => {});
   }, []);
 
@@ -23,10 +19,6 @@ export function AdminLoginPage() {
     event.preventDefault();
     setBusy(true);
     setError("");
-    if (ADMIN_TEST_MODE) {
-      window.location.hash = "#/admin";
-      return;
-    }
     try {
       await apiRequest("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
       window.location.hash = "#/admin";
@@ -62,10 +54,10 @@ export function AdminLoginPage() {
         <h1>Welcome back.</h1>
         <p className="admin-login-intro">Sign in to tend to your collections and pieces.</p>
         <form onSubmit={handleSubmit}>
-          <label>Email address<input autoComplete="username" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required={!ADMIN_TEST_MODE} /></label>
-          <label>Password<input autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required={!ADMIN_TEST_MODE} /></label>
+          <label>Email address<input autoComplete="username" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
+          <label>Password<input autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
           {error && <p className="admin-form-error" role="alert">{error}</p>}
-          <button className="admin-primary-button" type="submit" disabled={busy}>{busy ? "Opening…" : ADMIN_TEST_MODE ? "Open dashboard" : "Sign in"}</button>
+          <button className="admin-primary-button" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
         </form>
         <a className="admin-back-link" href="#/home">← Back to the storefront</a>
       </section>
@@ -185,12 +177,6 @@ export function AdminDashboardPage() {
   const [error, setError] = useState("");
 
   const loadData = useCallback(async () => {
-    if (ADMIN_TEST_MODE) {
-      setAdmin({ email: "Local preview" });
-      setCollections([]);
-      setProducts([]);
-      return;
-    }
     const session = await apiRequest("/auth/me");
     setAdmin(session.admin);
     const [collectionData, productData] = await Promise.all([
@@ -250,7 +236,6 @@ export function AdminDashboardPage() {
       </aside>
       <main className="admin-main">
         <header className="admin-topbar"><div><p className="section-kicker">HOUSE OF DAKSHA · STORE MANAGEMENT</p><h1>{title}</h1></div><span>{admin?.email}</span></header>
-        {ADMIN_TEST_MODE && <p className="admin-preview-notice" role="status"><span aria-hidden="true">✳</span> Preview mode · sign-in and saving changes are not connected yet.</p>}
         {error && <p className="admin-form-error" role="alert">{error}</p>}
         {loading ? <p className="admin-loading">Opening your dashboard…</p> : <>
           {view === "overview" && <section className="admin-overview">
