@@ -61,11 +61,23 @@ function BrandMark() {
   );
 }
 
+function DakshaLogoDrawing() {
+  return (
+    <div className="intro-logo-art" aria-label="House of Daksha floral logo">
+      <img src="/images/house-of-daksha-mark.svg" alt="House of Daksha" />
+      <svg className="intro-gold-thread" viewBox="120 240 840 770" aria-hidden="true">
+        <path d="M408 708 C385 672 357 650 324 636 C355 643 383 654 408 674 C404 624 403 571 409 522 C425 564 442 610 451 656 C478 614 515 581 560 558 C538 601 496 632 451 656 C499 680 546 703 599 690 C572 716 528 716 489 694 C475 729 477 758 500 785 C467 768 449 736 451 656 C437 697 417 720 389 728 C407 718 414 704 408 690" />
+      </svg>
+    </div>
+  );
+}
+
 function DakshaIntro({ onEnter }) {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    const closeTimer = window.setTimeout(() => setIsClosing(true), 3100);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const closeTimer = window.setTimeout(() => setIsClosing(true), reducedMotion ? 1900 : 6600);
     return () => window.clearTimeout(closeTimer);
   }, []);
 
@@ -94,27 +106,8 @@ function DakshaIntro({ onEnter }) {
         ENTER THE HOUSE <span aria-hidden="true">↗</span>
       </button>
       <div className="intro-composition">
-        <p className="intro-kicker"><span /> A HOUSE FOR EVERY CHAPTER <span /></p>
-        <div className="intro-nameplate">
-          <span>THOUGHTFULLY HANDPICKED</span>
-          <h1>HOUSE <i>OF</i> DAKSHA</h1>
-        </div>
-        <div className="intro-swatch">
-          <img src={asset("cotton-still-life.jpg")} alt="" />
-          <svg className="intro-stitch" viewBox="0 0 900 360" preserveAspectRatio="none" aria-hidden="true">
-            <path className="intro-thread-path" d="M-20 290C108 290 89 76 219 111s112 150 202 88 100-108 177-75 89 118 173 66 95-114 151-142" />
-            <path className="intro-thread-flower" d="M420 175c-35-29-15-66 14-58 5-36 52-32 53 4 33-12 57 27 27 52 12 34-27 57-52 30-33 14-59-11-42-28Z" />
-            <circle className="intro-thread-center" cx="468" cy="175" r="9" />
-          </svg>
-          <span className="intro-swatch-edge" aria-hidden="true" />
-          <div className="intro-mark"><BrandMark /></div>
-        </div>
-        <div className="intro-signoff">
-          <p>GOOD COTTON. GOOD DAYS.</p>
-          <span>A little room to bloom.</span>
-        </div>
+        <DakshaLogoDrawing />
       </div>
-      <div className="intro-corner-note" aria-hidden="true">MADE TO FEEL LIKE YOU <i>✳</i></div>
     </section>
   );
 }
