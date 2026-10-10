@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiRequest, formatPrice } from "../lib/api.js";
 
-// Local-only dashboard preview while the production admin authentication is being set up.
-const ADMIN_TEST_MODE = import.meta.env.DEV;
+// Temporary dashboard preview. Enable explicitly in hosted builds until the API is deployed.
+const ADMIN_TEST_MODE = import.meta.env.DEV || import.meta.env.VITE_ADMIN_TEST_MODE === "true";
 
 function AdminBrand() {
   return <a className="admin-brand" href="#/home">HOUSE <i>OF</i> DAKSHA <span>✳</span></a>;
