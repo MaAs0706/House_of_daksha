@@ -61,25 +61,36 @@ function BrandMark() {
   );
 }
 
-function DakshaLogoDrawing() {
+function CottonLoomOpening() {
+  const warpThreads = Array.from({ length: 23 }, (_, index) => 30 + index * 30);
+  const weftThreads = Array.from({ length: 13 }, (_, index) => 45 + index * 27);
+  const shuttlePath = Array.from({ length: 9 }, (_, index) => {
+    const x = 27 + index * 74;
+    const crest = index % 2 === 0 ? 181 : 239;
+    return `C ${x + 18} 210 ${x + 18} ${crest} ${x + 37} ${crest} S ${x + 56} 210 ${x + 74} 210`;
+  }).join(" ");
+
   return (
-    <div className="intro-logo-art" aria-label="House of Daksha floral logo">
-      <svg className="intro-logo-drawing" viewBox="0 0 600 680" role="img" aria-label="House of Daksha floral logo">
-        <g className="intro-emblem-thread" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-          <path pathLength="1" className="thread-petal thread-petal-1" d="M300 292C265 255 245 215 252 166c31 16 49 44 48 86 5-72 22-120 52-151 30 31 47 79 52 151-1-42 17-70 48-86 7 49-13 89-48 126" />
-          <path pathLength="1" className="thread-petal thread-petal-2" d="M300 292c-42-19-85-25-128-12 13-39 48-63 99-59m29 71c-57-8-111-4-162 18 18-43 57-68 117-69m45 51c42-19 85-25 128-12-13-39-48-63-99-59m-29 71c57-8 111-4 162 18-18-43-57-68-117-69" />
-          <path pathLength="1" className="thread-vein thread-vein-1" d="M300 291c0 57-4 109-22 155-13 34-37 56-69 50-28-5-42-30-30-53 12-23 44-21 51-1 5 14-2 25-14 30m84-181c2 54 18 95 51 124 33 29 75 40 111 21 26-14 29-41 10-54-16-12-38-1-37 18 1 10 7 16 16 18m-140-98c24-37 44-76 60-118 13-35 32-55 55-49 19 5 25 25 13 41-9 12-27 12-33-1m-68 115c37-31 73-60 111-83 30-18 57-20 72-2 13 16 6 35-11 41-14 5-27-5-25-18" />
-          <path pathLength="1" className="thread-vein thread-vein-2" d="M272 363c-35-45-76-73-126-82-35-7-61 1-68 22-6 19 8 34 26 30 14-3 20-17 12-27m168 70c-45-28-88-40-130-35-34 4-54 20-52 39 2 17 19 26 33 16 11-8 10-23-1-29m194-65c32-43 75-69 124-77 35-6 61 3 67 25 5 19-10 33-28 28-13-4-19-18-10-28m-190 83c45-26 89-36 131-30 34 5 53 22 49 41-3 17-21 24-34 13-10-9-8-24 3-29" />
-          <path pathLength="1" className="thread-leaf thread-leaf-1" d="M201 290c-7-35 2-62 29-86 15 34 5 63-29 86Zm-53-8c-27-26-56-34-91-25 20 29 48 38 91 25Zm-11 75c-35-7-63 2-87 29 34 13 63 3 87-29Zm-45-9c-18 31-18 59 1 89 21-31 20-61-1-89Zm340-58c7-35-2-62-29-86-15 34-5 63 29 86Zm53-8c27-26 56-34 91-25-20 29-48 38-91 25Zm11 75c35-7 63 2 87 29-34 13-63 3-87-29Zm45-9c18 31 18 59-1 89-21-31-20-61 1-89Z" />
-          <path pathLength="1" className="thread-finish" d="M300 291v170m0 0c-26 37-52 55-88 60m88-60c26 37 52 55 88 60" />
+    <div className="loom-opening" aria-label="Cotton for the everyday">
+      <svg className="loom-weave" viewBox="0 0 720 390" aria-hidden="true">
+        <g className="loom-warp">
+          {warpThreads.map((x, index) => (
+            <path key={`warp-${x}`} pathLength="1" style={{ animationDelay: `${0.24 + index * 0.025}s` }} d={`M${x} 30V360`} />
+          ))}
         </g>
-        <circle className="intro-logo-center" cx="300" cy="290" r="5" />
-        <g className="intro-wordmark">
-          <path className="wordmark-rule" d="M106 536h112m164 0h112" />
-          <text className="wordmark-house" x="300" y="544" textAnchor="middle">HOUSE OF</text>
-          <text className="wordmark-daksha" x="300" y="633" textAnchor="middle">DAKSHA</text>
+        <g className="loom-weft">
+          {weftThreads.map((y, index) => (
+            <path key={`weft-${y}`} pathLength="1" style={{ animationDelay: `${0.42 + index * 0.04}s` }} d={`M30 ${y}H690`} />
+          ))}
         </g>
+        <path pathLength="1" className="loom-shuttle-thread" d={`M27 210 ${shuttlePath}`} />
       </svg>
+      <div className="loom-copy">
+        <span className="loom-kicker">COTTON, THREADED WITH CARE</span>
+        <h1>Made for the day <em>you’re in.</em></h1>
+        <p>Handpicked cottons for every chapter of everyday life.</p>
+      </div>
+      <span className="loom-petal" aria-hidden="true" />
     </div>
   );
 }
@@ -89,7 +100,7 @@ function DakshaIntro({ onEnter }) {
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const closeTimer = window.setTimeout(() => setIsClosing(true), reducedMotion ? 1900 : 6600);
+    const closeTimer = window.setTimeout(() => setIsClosing(true), reducedMotion ? 1900 : 5000);
     return () => window.clearTimeout(closeTimer);
   }, []);
 
@@ -118,7 +129,7 @@ function DakshaIntro({ onEnter }) {
         ENTER THE HOUSE <span aria-hidden="true">↗</span>
       </button>
       <div className="intro-composition">
-        <DakshaLogoDrawing />
+        <CottonLoomOpening />
       </div>
     </section>
   );
