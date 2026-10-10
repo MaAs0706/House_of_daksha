@@ -61,46 +61,11 @@ function BrandMark() {
   );
 }
 
-function CottonLoomOpening() {
-  const warpThreads = Array.from({ length: 23 }, (_, index) => 30 + index * 30);
-  const weftThreads = Array.from({ length: 13 }, (_, index) => 45 + index * 27);
-  const shuttlePath = Array.from({ length: 9 }, (_, index) => {
-    const x = 27 + index * 74;
-    const crest = index % 2 === 0 ? 181 : 239;
-    return `C ${x + 18} 210 ${x + 18} ${crest} ${x + 37} ${crest} S ${x + 56} 210 ${x + 74} 210`;
-  }).join(" ");
-
-  return (
-    <div className="loom-opening" aria-label="Cotton for the everyday">
-      <svg className="loom-weave" viewBox="0 0 720 390" aria-hidden="true">
-        <g className="loom-warp">
-          {warpThreads.map((x, index) => (
-            <path key={`warp-${x}`} pathLength="1" style={{ animationDelay: `${0.24 + index * 0.025}s` }} d={`M${x} 30V360`} />
-          ))}
-        </g>
-        <g className="loom-weft">
-          {weftThreads.map((y, index) => (
-            <path key={`weft-${y}`} pathLength="1" style={{ animationDelay: `${0.42 + index * 0.04}s` }} d={`M30 ${y}H690`} />
-          ))}
-        </g>
-        <path pathLength="1" className="loom-shuttle-thread" d={`M27 210 ${shuttlePath}`} />
-      </svg>
-      <div className="loom-copy">
-        <span className="loom-kicker">COTTON, THREADED WITH CARE</span>
-        <h1>Made for the day <em>you’re in.</em></h1>
-        <p>Handpicked cottons for every chapter of everyday life.</p>
-      </div>
-      <span className="loom-petal" aria-hidden="true" />
-    </div>
-  );
-}
-
 function DakshaIntro({ onEnter }) {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const closeTimer = window.setTimeout(() => setIsClosing(true), reducedMotion ? 1900 : 5000);
+    const closeTimer = window.setTimeout(() => setIsClosing(true), 3100);
     return () => window.clearTimeout(closeTimer);
   }, []);
 
@@ -129,8 +94,27 @@ function DakshaIntro({ onEnter }) {
         ENTER THE HOUSE <span aria-hidden="true">↗</span>
       </button>
       <div className="intro-composition">
-        <CottonLoomOpening />
+        <p className="intro-kicker"><span /> A HOUSE FOR EVERY CHAPTER <span /></p>
+        <div className="intro-nameplate">
+          <span>THOUGHTFULLY HANDPICKED</span>
+          <h1>HOUSE <i>OF</i> DAKSHA</h1>
+        </div>
+        <div className="intro-swatch">
+          <img src={asset("cotton-still-life.jpg")} alt="" />
+          <svg className="intro-stitch" viewBox="0 0 900 360" preserveAspectRatio="none" aria-hidden="true">
+            <path className="intro-thread-path" d="M-20 290C108 290 89 76 219 111s112 150 202 88 100-108 177-75 89 118 173 66 95-114 151-142" />
+            <path className="intro-thread-flower" d="M420 175c-35-29-15-66 14-58 5-36 52-32 53 4 33-12 57 27 27 52 12 34-27 57-52 30-33 14-59-11-42-28Z" />
+            <circle className="intro-thread-center" cx="468" cy="175" r="9" />
+          </svg>
+          <span className="intro-swatch-edge" aria-hidden="true" />
+          <div className="intro-mark"><BrandMark /></div>
+        </div>
+        <div className="intro-signoff">
+          <p>GOOD COTTON. GOOD DAYS.</p>
+          <span>A little room to bloom.</span>
+        </div>
       </div>
+      <div className="intro-corner-note" aria-hidden="true">MADE TO FEEL LIKE YOU <i>✳</i></div>
     </section>
   );
 }
