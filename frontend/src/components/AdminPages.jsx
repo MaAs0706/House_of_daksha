@@ -250,13 +250,36 @@ export function AdminDashboardPage() {
       </aside>
       <main className="admin-main">
         <header className="admin-topbar"><div><p className="section-kicker">HOUSE OF DAKSHA · STORE MANAGEMENT</p><h1>{title}</h1></div><span>{admin?.email}</span></header>
-        {ADMIN_TEST_MODE && <p className="admin-form-error" role="status">Local preview mode: authentication and saving changes are not connected yet.</p>}
+        {ADMIN_TEST_MODE && <p className="admin-preview-notice" role="status"><span aria-hidden="true">✳</span> Preview mode · sign-in and saving changes are not connected yet.</p>}
         {error && <p className="admin-form-error" role="alert">{error}</p>}
         {loading ? <p className="admin-loading">Opening your dashboard…</p> : <>
           {view === "overview" && <section className="admin-overview">
-            <p className="admin-welcome">Welcome in. Your latest pieces are ready to tend to.</p>
-            <div className="admin-stats"><article><span>COLLECTIONS</span><strong>{collections.length}</strong><small>{collections.filter((item) => item.is_published).length} published</small></article><article><span>DRESSES</span><strong>{products.length}</strong><small>{products.filter((item) => item.is_published).length} published</small></article><article><span>SHOP VISIBILITY</span><strong>{products.filter((item) => item.is_published).length ? "LIVE" : "DRAFT"}</strong><small>Published pieces appear in the shop</small></article></div>
-            <div className="admin-quick-actions"><button onClick={() => { setEditing({ type: "collection", item: null }); setView("collections"); }}>＋ Add a collection</button><button onClick={() => { setEditing({ type: "product", item: null }); setView("products"); }}>＋ Add a dress</button></div>
+            <div className="admin-overview-hero">
+              <div className="admin-overview-copy">
+                <p className="section-kicker">YOUR LITTLE CORNER OF THE DAKSHA WORLD</p>
+                <h2>A little space<br />to <em>grow.</em></h2>
+                <p>Bring your thoughtful cotton edits together, one lovely piece at a time.</p>
+                <div className="admin-quick-actions">
+                  <button className="admin-action-primary" onClick={() => { setEditing({ type: "product", item: null }); setView("products"); }}>＋ Add a dress</button>
+                  <button onClick={() => { setEditing({ type: "collection", item: null }); setView("collections"); }}>＋ Create a collection</button>
+                </div>
+              </div>
+              <div className="admin-overview-bloom" aria-hidden="true">
+                <svg viewBox="0 0 300 270" fill="none">
+                  <path d="M150 244c-7-49 13-94 54-132M150 244c-9-53-45-83-91-98m91 98c18-33 49-46 91-46" />
+                  <path d="M201 112c-22-20-19-48 4-62 22 15 27 41 4 62m-4 1c2-29 19-44 43-39-1 24-17 40-43 39ZM60 146c-1-28 17-46 43-41 2 24-13 41-43 41m-1 0c25-15 48-10 59 11-19 15-42 12-59-11Zm185 21c6-27 29-39 51-25-5 24-25 36-51 25m-1 0c28-7 47 5 50 29-23 9-44-1-50-29Z" />
+                  <path d="M150 152c-33-20-30-53-6-60 2-30 39-34 48-5 30-7 47 22 24 44 8 29-23 47-45 28-23 13-43-1-36-7Z" />
+                  <circle cx="162" cy="143" r="6" />
+                  <path d="M149 245c-12 11-27 16-44 15m46-15c12 11 27 16 44 15" />
+                </svg>
+                <span>HOUSE OF DAKSHA <i>✳</i></span>
+              </div>
+            </div>
+            <div className="admin-stats">
+              <article><span>YOUR COLLECTIONS</span><strong>{collections.length.toString().padStart(2, "0")}</strong><small>{collections.filter((item) => item.is_published).length} available to shoppers</small></article>
+              <article><span>YOUR DRESSES</span><strong>{products.length.toString().padStart(2, "0")}</strong><small>{products.filter((item) => item.is_published).length} pieces published</small></article>
+              <article><span>SHOP STATUS</span><strong className="admin-stat-word">{products.filter((item) => item.is_published).length ? "In bloom" : "A new page"}</strong><small>{products.filter((item) => item.is_published).length ? "Your collection is visible" : "Your first piece is waiting"}</small></article>
+            </div>
           </section>}
           {view === "collections" && <section className="admin-content-panel">
             {!editing && <div className="admin-panel-heading"><div><p className="section-kicker">YOUR EDITS</p><h2>Collections</h2></div><button className="admin-primary-button" onClick={() => setEditing({ type: "collection", item: null })}>＋ Add collection</button></div>}
