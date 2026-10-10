@@ -477,16 +477,28 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
 .daksha-intro::before { width: min(68vw, 860px); aspect-ratio: 1; left: -24%; top: -43%; box-shadow: 0 0 0 26px rgba(104,116,90,.025), 0 0 0 60px rgba(104,116,90,.018); }
 .daksha-intro::after { width: min(57vw, 700px); aspect-ratio: 1; right: -19%; bottom: -52%; box-shadow: 0 0 0 25px rgba(177,148,98,.035); }
 .intro-composition { width: min(660px, calc(100% - 44px)); display: grid; place-items: center; }
-.intro-logo-art { position: relative; width: min(100%, 570px); aspect-ratio: 840 / 770; opacity: 0; animation: intro-rise .8s cubic-bezier(.2,.7,.2,1) .2s forwards; }
-.intro-logo-art > img { display: block; width: 100%; height: 100%; object-fit: contain; clip-path: inset(0 0 100% 0); animation: logo-thread-reveal 3.9s cubic-bezier(.48,.04,.2,1) .65s forwards; }
-.intro-gold-thread { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.intro-gold-thread path { fill: none; stroke: #c9a96e; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1400 1400; stroke-dashoffset: 1400; filter: drop-shadow(0 0 4px rgba(201,169,110,.42)); animation: golden-thread-draw 4.3s cubic-bezier(.42,.02,.2,1) .35s forwards; }
+.intro-logo-art { width: min(570px, calc((100svh - 120px) * .88), calc(100vw - 48px)); aspect-ratio: 600 / 680; color: #b7955e; opacity: 0; animation: intro-rise .8s cubic-bezier(.2,.7,.2,1) .12s forwards; }
+.intro-logo-drawing { display: block; width: 100%; height: 100%; overflow: visible; }
+.intro-emblem-thread path, .wordmark-rule { fill: none; stroke: currentColor; stroke-width: 2.05; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 2px rgba(183,149,94,.22)); }
+.thread-petal-1 { animation: logo-thread-draw 1.05s cubic-bezier(.4,.05,.2,1) .35s forwards; }
+.thread-petal-2 { animation: logo-thread-draw 1.05s cubic-bezier(.4,.05,.2,1) 1.22s forwards; }
+.thread-vein-1 { animation: logo-thread-draw 1.35s cubic-bezier(.4,.05,.2,1) 2.08s forwards; }
+.thread-vein-2 { animation: logo-thread-draw 1.05s cubic-bezier(.4,.05,.2,1) 2.95s forwards; }
+.thread-leaf-1 { animation: logo-thread-draw 1.15s cubic-bezier(.4,.05,.2,1) 3.62s forwards; }
+.thread-finish { animation: logo-thread-draw .9s cubic-bezier(.4,.05,.2,1) 4.38s forwards; }
+.intro-logo-center { fill: #c4a574; opacity: 0; animation: logo-center-form .35s ease 4.95s forwards; }
+.intro-wordmark { color: var(--ink); }
+.wordmark-rule { stroke: #b7955e; stroke-width: 1.6; animation: logo-thread-draw .6s ease 5.02s forwards; }
+.wordmark-house, .wordmark-daksha { opacity: 0; }
+.wordmark-house { fill: currentColor; font: 400 20px/1 var(--sans); letter-spacing: 7px; animation: logo-letter-form .65s ease 5.12s forwards; }
+.wordmark-daksha { fill: currentColor; font: 400 80px/1 var(--serif); letter-spacing: 3px; animation: logo-letter-form .7s cubic-bezier(.2,.7,.2,1) 5.35s forwards; }
 .intro-skip { position: absolute; z-index: 2; top: 32px; right: 40px; padding: 11px 14px; color: var(--olive-dark); border: 1px solid rgba(177,148,98,.68); background: rgba(255,253,248,.5); cursor: pointer; font: 8px var(--sans); letter-spacing: .13em; }
 .intro-skip span { margin-left: 6px; color: var(--gold); font-size: 13px; }
 .daksha-intro.is-closing { animation: intro-curtain-lift .68s cubic-bezier(.75,0,.18,1) forwards; pointer-events: none; }
 @keyframes intro-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes logo-thread-reveal { to { clip-path: inset(0); } }
-@keyframes golden-thread-draw { to { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes logo-thread-draw { to { stroke-dashoffset: 0; } }
+@keyframes logo-center-form { to { opacity: 1; } }
+@keyframes logo-letter-form { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes intro-curtain-lift { to { transform: translateY(-101%); visibility: hidden; } }
 
 @media (max-width: 760px) {
@@ -517,7 +529,7 @@ body:has(.admin-app), body:has(.admin-login-page) { background: #f8f6f0; }
   .product-detail-image { max-height: 640px; }
   .admin-login-page { min-height: 100svh; padding: 100px 20px 35px; }
   .intro-composition { width: calc(100% - 38px); }
-  .intro-logo-art { width: min(100%, 470px); }
+  .intro-logo-art { width: min(470px, calc((100svh - 96px) * .88), calc(100vw - 40px)); }
   .intro-skip { top: 21px; right: 18px; padding: 10px; font-size: 7px; }
   .admin-login-page > .admin-brand { top: 24px; left: 20px; font-size: 13px; }
   .login-vine { width: 38vw; height: 65vh; opacity: .38; }
