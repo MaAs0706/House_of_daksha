@@ -362,7 +362,7 @@ def admin_products(_admin: dict = Depends(require_admin)):
 def validate_product(body: dict[str, Any], current: dict[str, Any] | None = None) -> tuple[Any, ...]:
     current = current or {}
     name = str(body.get("name", current.get("name", ""))).strip()
-    slug = slugify(body.get("slug", name))
+    slug = slugify(str(body.get("slug") or "").strip() or name)
     price_value = body.get("price")
     if price_value is None and current.get("price_paise") is not None:
         price_value = current["price_paise"] / 100
