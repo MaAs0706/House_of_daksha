@@ -410,6 +410,10 @@ a { color: inherit; }
 .admin-login-card form, .admin-edit-form { display: grid; gap: 18px; }
 .admin-login-card label, .admin-form-grid > label:not(.admin-checkbox), .admin-field-label { display: grid; gap: 8px; font-size: 10px; letter-spacing: .04em; }
 .admin-login-card input, .admin-form-grid input:not([type="checkbox"]), .admin-form-grid textarea, .admin-form-grid select { width: 100%; min-height: 43px; padding: 11px 12px; color: var(--ink); border: 1px solid var(--rule); border-radius: 0; outline-color: var(--olive); background: #fffdf8; font: 12px var(--sans); }
+.admin-password-control { position: relative; display: block; }
+.admin-password-control input { padding-right: 58px; }
+.admin-password-toggle { position: absolute; top: 50%; right: 10px; padding: 6px 4px; transform: translateY(-50%); color: var(--olive-dark); border: 0; background: transparent; cursor: pointer; font: 10px var(--sans); letter-spacing: .04em; }
+.admin-password-toggle:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .admin-form-grid textarea { resize: vertical; }
 .admin-login-card .admin-primary-button { width: 100%; }
 .admin-primary-button { min-height: 42px; padding: 11px 16px; color: #fffdf8; border: 0; background: var(--olive-dark); cursor: pointer; font: 10px var(--sans); letter-spacing: .08em; }

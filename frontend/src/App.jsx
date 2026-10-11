@@ -609,7 +609,6 @@ function SiteFooter() {
         <a href="#/about">About Us</a>
         <a href="#/contact">Contact Us</a>
         <a href="#/care">Product care</a>
-        <a href="#/admin/login">Admin</a>
       </nav>
       <small>© {new Date().getFullYear()} HOUSE OF DAKSHA</small>
     </footer>

@@ -8,6 +8,7 @@ function AdminBrand() {
 export function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -55,7 +56,7 @@ export function AdminLoginPage() {
         <p className="admin-login-intro">Sign in to tend to your collections and pieces.</p>
         <form onSubmit={handleSubmit}>
           <label>Email address<input autoComplete="username" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
-          <label>Password<input autoComplete="current-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
+          <label>Password<span className="admin-password-control"><input autoComplete="current-password" type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} required /><button className="admin-password-toggle" type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)}>{showPassword ? "Hide" : "Show"}</button></span></label>
           {error && <p className="admin-form-error" role="alert">{error}</p>}
           <button className="admin-primary-button" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
         </form>
