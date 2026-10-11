@@ -196,7 +196,7 @@ export function AdminDashboardPage() {
   }, [loadData]);
 
   async function saveCollection(form) {
-    const editingId = editing?.type === "collection" ? editing.item.id : null;
+    const editingId = editing?.type === "collection" ? editing.item?.id : null;
     await apiRequest(editingId ? `/admin/collections/${editingId}` : "/admin/collections", {
       method: editingId ? "PATCH" : "POST", body: JSON.stringify(form),
     });
@@ -204,7 +204,7 @@ export function AdminDashboardPage() {
   }
 
   async function saveProduct(form) {
-    const editingId = editing?.type === "product" ? editing.item.id : null;
+    const editingId = editing?.type === "product" ? editing.item?.id : null;
     await apiRequest(editingId ? `/admin/products/${editingId}` : "/admin/products", {
       method: editingId ? "PATCH" : "POST", body: JSON.stringify(form),
     });
