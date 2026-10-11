@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import GallerySection from "./components/GallerySection.jsx";
-import FlowingMenu from "./components/FlowingMenu.jsx";
 import { ShopCatalogPage, CollectionDirectory, CollectionDetailPage, ProductDetailPage } from "./components/CatalogPages.jsx";
 import { AdminLoginPage, AdminDashboardPage } from "./components/AdminPages.jsx";
 
@@ -189,6 +188,8 @@ function PetalField() {
 
 function SiteHeader({ page }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuView, setMobileMenuView] = useState("main");
+  const [expandedShopGroup, setExpandedShopGroup] = useState("");
   const menuToggleRef = useRef(null);
   const menuCloseRef = useRef(null);
   const shopLinks = [
@@ -206,12 +207,6 @@ function SiteHeader({ page }) {
     ["Product Care", "care"],
     ["Gallery", "gallery"],
   ];
-  const flowingItems = [...links.slice(0, 2), ...shopLinks, ...links.slice(2), ["Admin login", "admin/login"]].map(([text, route], index) => ({
-    text,
-    link: `#/${route}`,
-    image: asset(`gallery/look-${String(index === 10 ? 12 : (index % 12) + 1).padStart(2, "0")}.jpg`),
-  }));
-
   useEffect(() => {
     if (!menuOpen) return undefined;
     const oldOverflow = document.body.style.overflow;
@@ -219,8 +214,7 @@ function SiteHeader({ page }) {
     menuCloseRef.current?.focus();
     const closeOnEscape = (event) => {
       if (event.key === "Escape") {
-        setMenuOpen(false);
-        window.requestAnimationFrame(() => menuToggleRef.current?.focus());
+        closeMenu();
       }
     };
     window.addEventListener("keydown", closeOnEscape);
@@ -232,7 +226,14 @@ function SiteHeader({ page }) {
 
   const closeMenu = () => {
     setMenuOpen(false);
+    setMobileMenuView("main");
+    setExpandedShopGroup("");
     window.requestAnimationFrame(() => menuToggleRef.current?.focus());
+  };
+
+  const openShopMenu = () => {
+    setMobileMenuView("shop");
+    setExpandedShopGroup("");
   };
 
   return (
@@ -277,12 +278,41 @@ function SiteHeader({ page }) {
       {menuOpen && (
         <div className="mobile-flow-overlay" role="dialog" aria-modal="true" aria-label="Site navigation">
           <div className="mobile-flow-head">
+            <button ref={menuCloseRef} className="mobile-flow-close" type="button" aria-label="Close navigation menu" onClick={closeMenu}>×</button>
             <a className="mobile-flow-brand" href="#/home" onClick={closeMenu}>
               HOUSE <span>OF</span> DAKSHA
             </a>
-            <button ref={menuCloseRef} className="mobile-flow-close" type="button" aria-label="Close navigation menu" onClick={closeMenu}>×</button>
           </div>
-          <FlowingMenu items={flowingItems} onSelect={closeMenu} />
+          {mobileMenuView === "main" ? (
+            <nav className="mobile-nav-list" aria-label="Mobile site pages">
+              {links.map(([label, route]) => route === "shop" ? (
+                <button className="mobile-nav-link mobile-nav-shop" type="button" key={route} onClick={openShopMenu} aria-haspopup="true">
+                  <span>{label}</span><span className="mobile-nav-arrow" aria-hidden="true">›</span>
+                </button>
+              ) : (
+                <a className="mobile-nav-link" href={`#/${route}`} key={route} aria-current={route === page ? "page" : undefined} onClick={closeMenu}>{label}</a>
+              ))}
+              <a className="mobile-nav-link mobile-nav-admin" href="#/admin/login" onClick={closeMenu}>Admin login</a>
+            </nav>
+          ) : (
+            <nav className="mobile-nav-list mobile-nav-shop-view" aria-label="Shop navigation">
+              <div className="mobile-nav-shop-title">
+                <button type="button" onClick={() => { setMobileMenuView("main"); setExpandedShopGroup(""); }} aria-label="Back to main menu"><span aria-hidden="true">‹</span> Shop</button>
+              </div>
+              <div className="mobile-nav-accordion">
+                <button className="mobile-nav-accordion-trigger" type="button" aria-expanded={expandedShopGroup === "categories"} onClick={() => setExpandedShopGroup(expandedShopGroup === "categories" ? "" : "categories")}>
+                  <span>Shop by categories</span><span aria-hidden="true">{expandedShopGroup === "categories" ? "−" : "+"}</span>
+                </button>
+                {expandedShopGroup === "categories" && <div className="mobile-nav-subitems"><a href="#/shop" onClick={closeMenu}>All shop pieces</a>{shopLinks.slice(0, 3).map(([label, route]) => <a href={`#/${route}`} key={route} onClick={closeMenu}>{label}</a>)}</div>}
+              </div>
+              <div className="mobile-nav-accordion">
+                <button className="mobile-nav-accordion-trigger" type="button" aria-expanded={expandedShopGroup === "collections"} onClick={() => setExpandedShopGroup(expandedShopGroup === "collections" ? "" : "collections")}>
+                  <span>Shop by collection</span><span aria-hidden="true">{expandedShopGroup === "collections" ? "−" : "+"}</span>
+                </button>
+                {expandedShopGroup === "collections" && <div className="mobile-nav-subitems"><a href="#/collections" onClick={closeMenu}>All collections</a></div>}
+              </div>
+            </nav>
+          )}
         </div>
       )}
     </>
